@@ -172,6 +172,12 @@ class LecturaController extends Controller
         $anterior = Lectura::where('usuario_id', $data['usuario_id'])->latest()->first();
         // Si existe una lectura previa, usarla; si no, usar la lectura_inicial del usuario como lectura anterior
         $lectura_anterior = $anterior ? $anterior->lectura_actual : ($usuario->lectura_inicial ?? 0);
+
+        if ($data['lectura_actual'] < $lectura_anterior) {
+            return back()->withErrors(['lectura_actual' => "La lectura actual ({$data['lectura_actual']}) no puede ser menor que la lectura anterior ($lectura_anterior)."])
+                         ->withInput();
+        }
+
         $consumo_mes = max(0, $data['lectura_actual'] - $lectura_anterior);
         $total_pagar = $this->calcularTotalPagar($consumo_mes);
 
@@ -218,8 +224,12 @@ class LecturaController extends Controller
 
         DB::transaction(function () use ($data) {
             $lecturaInicial = (float) $data['lectura_inicial'];
+            
+            // En PostgreSQL no se puede usar lockForUpdate() junto con funciones de agregado como max().
+            // Para evitar duplicados en el código de socio, bloqueamos la fila de la comunidad relacionada.
+            Comunidad::where('id', $data['comunidad_id'])->lockForUpdate()->first();
+
             $siguienteCodigo = ((int) Usuario::where('comunidad_id', $data['comunidad_id'])
-                ->lockForUpdate()
                 ->max('codigo_socio')) + 1;
 
             $usuario = Usuario::create([
