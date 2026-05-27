@@ -87,35 +87,39 @@ class LecturaController extends Controller
             return redirect()->route('home')->with('error', 'Ingrese un código de medidor o número de socio.');
         }
 
-        $usuarioQuery = \App\Models\Usuario::with('comunidad')
-            ->where(function ($q) use ($codigo_buscado) {
-                $q->where('codigo_medidor', 'LIKE', '%' . $codigo_buscado . '%');
+        $usuario = null;
 
-                // Si el término es numérico, buscar también por codigo_socio exacto
-                if (is_numeric($codigo_buscado)) {
-                    $q->orWhere('codigo_socio', (int) $codigo_buscado);
-                }
-            });
+        // Intentar buscar por el formato "PREFIJO - CODIGO_SOCIO" (ej. 'LA -0001')
+        // Modificado el regex para aceptar espacios alrededor del guion y ceros iniciales opcionales
+        if (preg_match('/^([A-Za-z]+)\s*-\s*0*(\d+)$/', $codigo_buscado, $parts)) {
+            $prefijo = strtoupper($parts[1]); // Ej: LA
+            $numero_socio = (int) $parts[2]; // Ej: 1
 
-        // Si el formato es como en la factura (ej. 'LA-0003' o 'LA-3'), extraer prefijo y número
-        if (preg_match('/^([A-Za-z]+)-?0*(\d+)$/', $codigo_buscado, $parts)) {
-            $prefijo = strtoupper($parts[1]);
-            $numero = (int) $parts[2];
+            $len_prefijo = strlen($prefijo);
 
-            $len = strlen($prefijo);
-
-            $usuarioQuery = \App\Models\Usuario::with('comunidad')
-                ->where(function ($q) use ($codigo_buscado, $prefijo, $len, $numero) {
-                    $q->where('codigo_medidor', 'LIKE', '%' . $codigo_buscado . '%');
-                    $q->orWhere('codigo_socio', $numero);
-                })
-                ->whereHas('comunidad', function ($q) use ($prefijo, $len) {
+            $usuario = \App\Models\Usuario::with('comunidad')
+                ->where('codigo_socio', $numero_socio)
+                ->whereHas('comunidad', function ($q) use ($prefijo, $len_prefijo) {
                     // Compara las primeras letras del nombre de la comunidad con el prefijo (en mayúsculas)
-                    $q->whereRaw('UPPER(LEFT(nombre, ?)) = ?', [$len, $prefijo]);
-                });
+                    $q->whereRaw('UPPER(LEFT(nombre, ?)) = ?', [$len_prefijo, $prefijo]);
+                })
+                ->first();
         }
 
-        $usuario = $usuarioQuery->first();
+        // Si no se encontró por el formato especial, o si el formato no coincidió,
+        // intentar con la búsqueda original por codigo_medidor o solo codigo_socio
+        if (!$usuario) {
+            $usuario = \App\Models\Usuario::with('comunidad')
+                ->where(function ($q) use ($codigo_buscado) {
+                    $q->where('codigo_medidor', 'LIKE', '%' . $codigo_buscado . '%');
+
+                    // Si el término es numérico, buscar también por codigo_socio exacto
+                    if (is_numeric($codigo_buscado)) {
+                        $q->orWhere('codigo_socio', (int) $codigo_buscado);
+                    }
+                })
+                ->first();
+        }
 
         if (!$usuario) {
             return redirect()->route('home')->with('error', 'No se encontró ningún socio. Verifica si el código es correcto.');
