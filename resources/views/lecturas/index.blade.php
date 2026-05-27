@@ -656,6 +656,17 @@
                     🏢 {{ $comunidad->nombre }}
                 </a>
             @endforeach
+
+            <div class="menu-section-title">Sistema</div>
+            <a href="{{ route('password.change') }}" class="nav-item-link">
+                <i class="fa-solid fa-key"></i> Contraseña
+            </a>
+            <form action="{{ route('logout') }}" method="POST" class="m-0">
+                @csrf
+                <button type="submit" class="nav-item-link w-100 border-0 bg-transparent text-start" style="cursor: pointer;">
+                    <i class="fa-solid fa-right-from-bracket text-danger"></i> <span class="text-danger">Salir</span>
+                </button>
+            </form>
         </div>
     </div>
 
@@ -678,17 +689,6 @@
                 <a href="{{ route('pagos.index', ['comunidad_id' => $comunidadSeleccionada]) }}" class="btn btn-outline-warning fw-semibold px-3 py-1.5" style="border-radius: 8px; font-size: 0.85rem;">
                     ✅ Pagos
                 </a>
-
-                <a href="{{ route('password.change') }}" class="btn btn-link text-dark p-0 small fw-semibold text-decoration-none">
-                    <i class="fa-solid fa-key"></i> Contraseña
-                </a>
-                
-                <form action="{{ route('logout') }}" method="POST" class="m-0">
-                    @csrf
-                    <button type="submit" class="btn btn-link text-danger p-0 small fw-semibold text-decoration-none">
-                        <i class="fa-solid fa-right-from-bracket"></i> Salir
-                    </button>
-                </form>
 
                 <span class="user-badge">OPERADOR</span>
                 <div class="user-avatar">SA</div>

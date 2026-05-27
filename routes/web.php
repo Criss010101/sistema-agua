@@ -30,34 +30,7 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::post('/pagos', [LecturaController::class, 'actualizarPagos'])->name('pagos.actualizar');
     Route::get('/reportes/comunidad', [LecturaController::class, 'reporteComunidad'])->name('reportes.comunidad');
 });
-use Illuminate\Support\Facades\Artisan;
-
-Route::get('/ejecutar-seeder-secreto', function () {
-    try {
-        Artisan::call('db:seed');
-        return '¡Seeder ejecutado con éxito! Tu usuario ya fue creado en Supabase.';
-    } catch (\Exception $e) {
-        return 'Hubo un error: ' . $e->getMessage();
-    }
-});
-
-// RUTA TEMPORAL: restablece/crea el administrador con usuario 'admin' y contraseña '123456'.
-// Borra esta ruta después de usarla por seguridad.
-Route::get('/fix-admin-pass', function () {
-    Administrador::updateOrCreate(
-        ['usuario' => 'admin'],
-        ['password' => '123456']
-    );
-
-    return 'Contraseña del administrador actualizada a 123456. Elimina /fix-admin-pass después.';
-});
 
 // Rutas para setup inicial de administrador (solo si no existe ninguno)
 Route::get('/setup-admin', [SetupController::class, 'showForm'])->name('setup.show');
 Route::post('/setup-admin', [SetupController::class, 'store'])->name('setup.store');
-
-// RUTA TEMPORAL: Elimina todos los administradores. BORRAR esta ruta tras usarla.
-Route::get('/delete-admins', function () {
-    Administrador::truncate();
-    return 'Se eliminaron todos los administradores. Elimina la ruta /delete-admins ahora.';
-});

@@ -385,13 +385,8 @@ class LecturaController extends Controller
             ->select('lecturas.*')
             ->get()
             ->map(function ($lectura) {
-                $anterior = Lectura::where('usuario_id', $lectura->usuario_id)
-                    ->where('created_at', '<', $lectura->created_at)
-                    ->orderByDesc('created_at')
-                    ->first();
-
-                $lectura->lectura_anterior_reporte = $anterior ? $anterior->lectura_actual : 0;
-
+                // Optimizamos: La lectura anterior es simplemente la actual menos el consumo registrado
+                $lectura->lectura_anterior_reporte = $lectura->lectura_actual - $lectura->consumo_mes;
                 return $lectura;
             });
 
