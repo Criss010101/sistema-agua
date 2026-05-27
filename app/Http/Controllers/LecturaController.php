@@ -111,12 +111,8 @@ class LecturaController extends Controller
         if (!$usuario) {
             $usuario = \App\Models\Usuario::with('comunidad')
                 ->where(function ($q) use ($codigo_buscado) {
-                    $q->where('codigo_medidor', 'LIKE', '%' . $codigo_buscado . '%');
-
-                    // Si el término es numérico, buscar también por codigo_socio exacto
-                    if (is_numeric($codigo_buscado)) {
-                        $q->orWhere('codigo_socio', (int) $codigo_buscado);
-                    }
+                    // Si el formato especial no coincidió, buscar solo por codigo_medidor con coincidencia exacta.
+                    $q->where('codigo_medidor', $codigo_buscado);
                 })
                 ->first();
         }
