@@ -17,6 +17,10 @@
             --dark-btn: #0f172a;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-main);
@@ -27,7 +31,7 @@
             overflow-x: hidden;
         }
 
-        /* BARRA LATERAL (SIDEBAR) ESILO UAGRM */
+        /* BARRA LATERAL */
         .sidebar {
             width: 260px;
             background-color: var(--sidebar-bg);
@@ -36,7 +40,9 @@
             flex-direction: column;
             flex-shrink: 0;
             padding: 24px 16px;
+            transition: left 0.28s ease, opacity 0.28s ease;
         }
+
         .sidebar-brand {
             padding: 10px 14px;
             margin-bottom: 30px;
@@ -44,6 +50,7 @@
             border-radius: 12px;
             background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
         }
+
         .sidebar-brand h5 {
             color: #ffffff;
             font-size: 0.95rem;
@@ -51,11 +58,13 @@
             margin: 0;
             letter-spacing: 0.5px;
         }
+
         .sidebar-brand span {
             font-size: 0.75rem;
             color: #6366f1;
             display: block;
         }
+
         .menu-section-title {
             font-size: 0.7rem;
             text-transform: uppercase;
@@ -66,11 +75,13 @@
             margin-bottom: 10px;
             padding-left: 12px;
         }
+
         .nav-menu {
             display: flex;
             flex-direction: column;
             gap: 6px;
         }
+
         .nav-item-link {
             display: flex;
             align-items: center;
@@ -84,16 +95,19 @@
             transition: all 0.2s ease;
             position: relative;
         }
+
         .nav-item-link:hover {
             background-color: #1e293b;
             color: #f8fafc;
         }
+
         .nav-item-link.active {
             background-color: var(--sidebar-active);
             color: #ffffff;
             font-weight: 600;
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
+
         .nav-item-link.active::before {
             content: '';
             position: absolute;
@@ -104,6 +118,7 @@
             background-color: #ffffff;
             border-radius: 0 4px 4px 0;
         }
+
         .btn-add-community {
             width: 100%;
             border: 1px dashed #334155;
@@ -119,13 +134,14 @@
             text-align: left;
             transition: all 0.2s ease;
         }
+
         .btn-add-community:hover {
             background: rgba(99, 102, 241, 0.18);
             border-color: #6366f1;
             color: #ffffff;
         }
 
-        /* CONTENEDOR PRINCIPAL DERECHO */
+        /* CONTENEDOR PRINCIPAL */
         .main-content {
             flex-grow: 1;
             display: flex;
@@ -135,7 +151,7 @@
             min-width: 0;
         }
 
-        /* BARRA SUPERIOR (TOPBAR) */
+        /* TOPBAR */
         .topbar {
             background-color: #ffffff;
             padding: 16px 40px;
@@ -146,6 +162,25 @@
             border-bottom: 1px solid #e2e8f0;
             flex-wrap: wrap;
         }
+
+        .hamburger-btn {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border: 1px solid #dbe4f0;
+            border-radius: 12px;
+            background: #ffffff;
+            color: #0f172a;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+            flex-shrink: 0;
+        }
+
+        .hamburger-btn:hover {
+            background: #f8fafc;
+        }
+
         .topbar-title h2 {
             font-size: 1.4rem;
             font-weight: 700;
@@ -155,11 +190,13 @@
             align-items: center;
             gap: 10px;
         }
+
         .topbar-title p {
             font-size: 0.85rem;
             color: var(--text-muted);
             margin: 2px 0 0 0;
         }
+
         .user-badge {
             background-color: #e0e7ff;
             color: #4f46e5;
@@ -170,6 +207,7 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+
         .user-avatar {
             width: 36px;
             height: 36px;
@@ -183,7 +221,7 @@
             font-size: 0.85rem;
         }
 
-        /* DISEÑO DE CONTENIDO CENTRAL */
+        /* CONTENIDO */
         .content-body {
             padding: 32px 40px;
             max-width: 1100px;
@@ -215,16 +253,17 @@
             flex-wrap: wrap;
         }
 
-        /* BARRA DE BÚSQUEDA Y FILTRADO */
         .search-wrapper {
             display: flex;
             gap: 12px;
             margin-bottom: 28px;
         }
+
         .search-container {
             position: relative;
             flex-grow: 1;
         }
+
         .search-container i {
             position: absolute;
             left: 18px;
@@ -232,6 +271,7 @@
             transform: translateY(-50%);
             color: #94a3b8;
         }
+
         .search-input {
             width: 100%;
             padding: 14px 16px 14px 48px;
@@ -243,10 +283,12 @@
             outline: none;
             transition: all 0.2s;
         }
+
         .search-input:focus {
             border-color: var(--sidebar-active);
             box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
         }
+
         .btn-filter-dark {
             background-color: var(--dark-btn);
             color: white;
@@ -260,6 +302,7 @@
             gap: 8px;
             transition: opacity 0.2s;
         }
+
         .btn-filter-dark:hover {
             opacity: 0.9;
             color: white;
@@ -278,15 +321,18 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.01);
             transition: transform 0.2s, box-shadow 0.2s;
         }
+
         .socio-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(0,0,0,0.04);
         }
+
         .socio-info-block {
             display: flex;
             align-items: center;
             gap: 20px;
         }
+
         .socio-icon-box {
             width: 48px;
             height: 48px;
@@ -298,12 +344,14 @@
             justify-content: center;
             font-size: 1.25rem;
         }
+
         .socio-details h4 {
             font-size: 1.1rem;
             font-weight: 700;
             color: #0f172a;
             margin: 0;
         }
+
         .socio-meta {
             display: flex;
             gap: 16px;
@@ -312,6 +360,7 @@
             color: var(--text-muted);
             align-items: center;
         }
+
         .meta-badge {
             background-color: #f1f5f9;
             color: #334155;
@@ -319,6 +368,7 @@
             border-radius: 6px;
             font-weight: 600;
         }
+
         .medidor-badge {
             background-color: #e0f2fe;
             color: #0369a1;
@@ -328,7 +378,6 @@
             font-family: monospace;
         }
 
-        /* ACCIONES E INGRESO DE METROS CÚBICOS */
         .socio-actions {
             display: flex;
             align-items: center;
@@ -336,6 +385,7 @@
             flex-wrap: wrap;
             justify-content: flex-end;
         }
+
         .input-m3 {
             width: 140px;
             padding: 10px;
@@ -345,6 +395,7 @@
             text-align: center;
             font-weight: 600;
         }
+
         .btn-boleta {
             background-color: #10b981;
             color: white;
@@ -355,9 +406,11 @@
             border: none;
             transition: background 0.2s;
         }
+
         .btn-boleta:hover {
             background-color: #059669;
         }
+
         .corte-option {
             display: flex;
             align-items: center;
@@ -372,6 +425,7 @@
             white-space: nowrap;
             cursor: pointer;
         }
+
         .corte-option input {
             width: 16px;
             height: 16px;
@@ -379,8 +433,41 @@
         }
 
         @media (max-width: 991.98px) {
-            .sidebar {
+            /* Capa de fondo para cerrar el menú al tocar fuera */
+            .sidebar-overlay {
                 display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(15, 23, 42, 0.5);
+                backdrop-filter: blur(2px);
+                z-index: 1100;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -300px;
+                width: 260px;
+                height: 100vh;
+                z-index: 1250;
+                display: flex;
+                box-shadow: 6px 0 24px rgba(15, 23, 42, 0.22);
+                transition: left 0.3s ease-in-out;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .hamburger-btn {
+                display: inline-flex;
             }
 
             .main-content {
@@ -541,6 +628,9 @@
 </head>
 <body>
 
+    <!-- Overlay para dispositivos móviles -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <div class="sidebar">
         <div class="sidebar-brand">
             <h5>Sistema S.A.G.</h5>
@@ -570,13 +660,14 @@
     </div>
 
     <div class="main-content">
-        
         <div class="topbar">
+            <button type="button" class="hamburger-btn" id="menuToggle" aria-label="Abrir menú">
+                <i class="fa-solid fa-bars"></i>
+            </button>
             <div class="topbar-title">
                 <h2>Lecturas <span class="badge bg-dark align-middle" style="font-size: 0.65rem; border-radius: 6px; background-color: #1e293b !important;">MEDICIÓN</span></h2>
                 <p>Gestión de lecturas y control de consumo mensual</p>
             </div>
-            
             <div class="topbar-actions">
                 <button type="button" class="btn btn-outline-primary fw-semibold px-3 py-1.5" style="border-radius: 8px; font-size: 0.85rem;" data-bs-toggle="modal" data-bs-target="#modalUsuario">
                     ➕ Nuevo Socio
@@ -658,8 +749,8 @@
                             </div>
                         </div>
 
-                            <div class="socio-actions">
-                                <form action="{{ route('lecturas.store') }}" method="POST" class="socio-form">
+                        <div class="socio-actions">
+                            <form action="{{ route('lecturas.store') }}" method="POST" class="socio-form">
                                 @csrf
                                 <input type="hidden" name="usuario_id" value="{{ $usuario->id }}">
                                 <input type="number" name="lectura_actual" class="input-m3" placeholder="M³ Actuales" required min="0" inputmode="numeric">
@@ -670,11 +761,8 @@
                                 <button type="submit" class="btn-boleta">
                                     <i class="fa-solid fa-file-invoice-dollar me-1"></i> Generar Boleta
                                 </button>
-                                @php
-                                    $ultimaLectura = \App\Models\Lectura::where('usuario_id', $usuario->id)->latest()->first();
-                                @endphp
-                                @if($ultimaLectura)
-                                    <a href="{{ route('factura.print', $ultimaLectura->id) }}" class="btn-boleta" style="background-color: #8b5cf6; text-decoration: none; display: inline-flex; align-items: center;" target="_blank">
+                                @if($usuario->ultimaLectura)
+                                    <a href="{{ route('factura.print', $usuario->ultimaLectura->id) }}" class="btn-boleta" style="background-color: #8b5cf6; text-decoration: none; display: inline-flex; align-items: center;" target="_blank">
                                         <i class="fa-solid fa-print me-1"></i> Imprimir Factura
                                     </a>
                                 @endif
@@ -831,6 +919,26 @@
 
             const comunidadSelect = document.getElementById('comunidadSocioSelect');
             const codigoSocioInput = document.getElementById('codigoSocioAutomatico');
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            const toggleMenu = () => {
+                sidebar?.classList.toggle('active');
+                sidebarOverlay?.classList.toggle('active');
+            };
+
+            menuToggle?.addEventListener('click', toggleMenu);
+            sidebarOverlay?.addEventListener('click', toggleMenu);
+
+            document.querySelectorAll('.sidebar a, .sidebar button').forEach((element) => {
+                element.addEventListener('click', () => {
+                    if (window.innerWidth <= 991.98) {
+                        sidebar?.classList.remove('active');
+                        sidebarOverlay?.classList.remove('active');
+                    }
+                });
+            });
 
             const actualizarCodigoSocio = () => {
                 if (!comunidadSelect || !codigoSocioInput) {

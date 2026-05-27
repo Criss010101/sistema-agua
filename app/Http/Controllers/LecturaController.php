@@ -135,7 +135,7 @@ class LecturaController extends Controller
             ->selectRaw('MAX(codigo_socio) + 1 as siguiente_codigo')
             ->groupBy('comunidad_id')
             ->pluck('siguiente_codigo', 'comunidad_id');
-        $usuarios = Usuario::with('comunidad')
+        $usuarios = Usuario::with(['comunidad', 'ultimaLectura'])
             ->when($comunidadSeleccionada, function ($query) use ($comunidadSeleccionada) {
                 return $query->where('comunidad_id', $comunidadSeleccionada);
             })
