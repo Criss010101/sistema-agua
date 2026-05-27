@@ -430,13 +430,23 @@
             @endif
 
             <div class="search-wrapper">
-                <div class="search-container">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" class="search-input" placeholder="Buscar socio por nombre o código...">
-                </div>
-                <button class="btn-filter-dark">
-                    <i class="fa-solid fa-sliders"></i> Filtrar
-                </button>
+                <form action="{{ route('lecturas.index') }}" method="GET" class="d-flex w-100 align-items-center">
+                    <div style="width: 240px; margin-right:12px">
+                        <select name="comunidad_id" class="form-select" style="border-radius: 12px; padding: 10px; background:white; color:black;">
+                            <option value="">Todas las comunidades</option>
+                            @foreach($comunidades as $c)
+                                <option value="{{ $c->id }}" {{ (string)$comunidadSeleccionada === (string)$c->id ? 'selected' : '' }}>{{ $c->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="search-container flex-grow-1">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" name="q" class="search-input" placeholder="Buscar socio por nombre, medidor o código..." value="{{ $search ?? '' }}">
+                    </div>
+                    <button type="submit" class="btn-filter-dark ms-3">
+                        <i class="fa-solid fa-magnifying-glass"></i> Buscar
+                    </button>
+                </form>
             </div>
 
             <div>

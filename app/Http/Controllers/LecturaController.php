@@ -129,19 +129,35 @@ class LecturaController extends Controller
     // Muestra el panel de administración
     public function index(Request $request) {
         $comunidadSeleccionada = $request->get('comunidad_id');
+        $search = trim((string) $request->get('q'));
         $comunidades = Comunidad::all();
         $siguienteCodigoPorComunidad = Usuario::select('comunidad_id')
             ->selectRaw('MAX(codigo_socio) + 1 as siguiente_codigo')
             ->groupBy('comunidad_id')
             ->pluck('siguiente_codigo', 'comunidad_id');
-        
         $usuarios = Usuario::with('comunidad')
             ->when($comunidadSeleccionada, function ($query) use ($comunidadSeleccionada) {
                 return $query->where('comunidad_id', $comunidadSeleccionada);
             })
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nombre', 'LIKE', '%' . $search . '%')
+                      ->orWhere('codigo_medidor', 'LIKE', '%' . $search . '%');
+                    // Si el término es numérico exacto
+                    if (is_numeric($search)) {
+                        $q->orWhere('codigo_socio', (int) $search);
+                    } else {
+                        // Si el término contiene dígitos mezclados con prefijos (ej. 'LA-0003', '#3', 'socio 3'), extraer dígitos y buscar
+                        if (preg_match('/(\d+)/', $search, $m)) {
+                            $num = (int) $m[1];
+                            $q->orWhere('codigo_socio', $num);
+                        }
+                    }
+                });
+            })
             ->get();
 
-        return view('lecturas.index', compact('usuarios', 'comunidades', 'comunidadSeleccionada', 'siguienteCodigoPorComunidad'));
+        return view('lecturas.index', compact('usuarios', 'comunidades', 'comunidadSeleccionada', 'siguienteCodigoPorComunidad', 'search'));
     }
 
     // Guarda una nueva lectura
@@ -238,10 +254,11 @@ class LecturaController extends Controller
             ->first();
         
         $lecturaAnteriorValor = $lecturaAnterior ? $lecturaAnterior->lectura_actual : 0;
+        // Limitar el histórico a los 5 registros más recientes (excluyendo la boleta actual)
         $historico = Lectura::where('usuario_id', $lectura->usuario_id)
             ->where('id', '!=', $lectura->id)
             ->orderByDesc('created_at')
-            ->limit(12)
+            ->limit(5)
             ->get();
 
         $fechaCobranza = request()->get('fecha_cobranza', now()->addDays(15)->format('d/m/Y'));

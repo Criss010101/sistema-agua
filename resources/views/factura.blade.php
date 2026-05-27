@@ -49,6 +49,7 @@
             }
         }
         body { font-family: 'Courier New', Courier, monospace; }
+        
     </style>
 </head>
 <body class="bg-gray-300 p-4 flex flex-col items-center">
@@ -59,7 +60,7 @@
     </div>
 
     <div class="contenedor-factura bg-white w-full max-w-2xl p-6 border-2 border-gray-800 text-black shadow-2xl rounded-sm">
-        
+
         <div class="text-center mb-4">
             <h1 class="text-md font-black text-blue-900 tracking-tight">C.A.P. "18 de Mayo" com. Coronación, La Senda y Cachuela España</h1>
             <p class="text-[11px] font-bold text-cyan-800">Distrito II, Municipio San Javier, Provincia Ñuflo de Chávez, Dpto. Santa Cruz</p>

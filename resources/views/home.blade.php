@@ -26,7 +26,10 @@
         <div class="d-flex justify-content-between align-items-center py-4">
             <div class="d-flex align-items-center gap-2">
                 <span style="font-size: 1.5rem; color: #2563eb;"><i class="fa-solid fa-droplet"></i></span>
-                <span class="fw-bold text-dark">Sistema S.A.G.</span>
+                <div class="d-flex flex-column">
+                    <span class="fw-bold text-dark">Sistema S.A.G.</span>
+                    <small class="text-muted" style="font-size:0.78rem">Creado por Cristian Olivera 2026</small>
+                </div>
             </div>
             <a href="{{ route('login') }}" class="btn btn-outline-secondary px-3 py-1.5 fw-semibold" style="border-radius: 10px; font-size: 0.85rem;">
                 <i class="fa-solid fa-lock me-1"></i> Iniciar Sesión (Control)
