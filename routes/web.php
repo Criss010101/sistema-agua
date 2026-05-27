@@ -27,3 +27,13 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::post('/pagos', [LecturaController::class, 'actualizarPagos'])->name('pagos.actualizar');
     Route::get('/reportes/comunidad', [LecturaController::class, 'reporteComunidad'])->name('reportes.comunidad');
 });
+use Illuminate\Support\Facades\Artisan;
+
+Route::get('/ejecutar-seeder-secreto', function () {
+    try {
+        Artisan::call('db:seed');
+        return '¡Seeder ejecutado con éxito! Tu usuario ya fue creado en Supabase.';
+    } catch (\Exception $e) {
+        return 'Hubo un error: ' . $e->getMessage();
+    }
+});
