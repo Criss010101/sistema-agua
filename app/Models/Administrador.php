@@ -8,6 +8,14 @@ class Administrador extends Authenticatable
 {
     protected $table = 'administradores';
 
-    // ASÍ LE DAMOS PERMISO DE GUARDAR ESTOS CAMPOS MASIVAMENTE
     protected $fillable = ['usuario', 'password'];
+
+    protected $hidden = ['password', 'remember_token'];
+
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+        ];
+    }
 }

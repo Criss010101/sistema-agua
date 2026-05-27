@@ -2,10 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Administrador;
 use Illuminate\Database\Seeder;
-// Las importaciones DEBEN ir aquí arriba:
-use App\Models\User; 
 use Illuminate\Support\Facades\Hash;
 
 class UsuarioAdministradorSeeder extends Seeder
@@ -15,11 +13,9 @@ class UsuarioAdministradorSeeder extends Seeder
      */
     public function run(): void
     {
-        // Tu función queda limpia y lista para registrarte:
-        User::create([
-            'name' => 'Cristian',
-            'email' => 'admin@admin.com', // Este será tu usuario/correo para loguearte
-            'password' => Hash::make('123456'), // Cambia esto por tu contraseña real
-        ]);
+        Administrador::firstOrCreate(
+            ['usuario' => env('ADMIN_DEFAULT_USER', 'admin')],
+            ['password' => Hash::make(env('ADMIN_DEFAULT_PASSWORD', '123456'))]
+        );
     }
 }

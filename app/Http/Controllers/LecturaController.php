@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use App\Models\Usuario;
 use App\Models\Lectura;
 use App\Models\Comunidad;
@@ -79,28 +79,61 @@ class LecturaController extends Controller
         ));
     }
 
-    // Busca el historial de un socio por su número de medidor
+    // Busca el historial de un socio por su número de medidor o por su código de socio
     public function consultarMedidor(Request $request) {
-    $codigo_buscado = $request->get('codigo_medidor');
-    
-    // Usamos 'like' para buscar coincidencias parciales
-    $usuario = \App\Models\Usuario::with('comunidad')
-        ->where('codigo_medidor', 'LIKE', '%' . $codigo_buscado . '%')
-        ->first();
+        $codigo_buscado = trim((string) $request->get('codigo_medidor'));
 
-    if (!$usuario) {
-        return redirect()->route('home')->with('error', 'No se encontró ningún socio. Verifica si el código es correcto.');
+        if ($codigo_buscado === '') {
+            return redirect()->route('home')->with('error', 'Ingrese un código de medidor o número de socio.');
+        }
+
+        $usuarioQuery = \App\Models\Usuario::with('comunidad')
+            ->where(function ($q) use ($codigo_buscado) {
+                $q->where('codigo_medidor', 'LIKE', '%' . $codigo_buscado . '%');
+
+                // Si el término es numérico, buscar también por codigo_socio exacto
+                if (is_numeric($codigo_buscado)) {
+                    $q->orWhere('codigo_socio', (int) $codigo_buscado);
+                }
+            });
+
+        // Si el formato es como en la factura (ej. 'LA-0003' o 'LA-3'), extraer prefijo y número
+        if (preg_match('/^([A-Za-z]+)-?0*(\d+)$/', $codigo_buscado, $parts)) {
+            $prefijo = strtoupper($parts[1]);
+            $numero = (int) $parts[2];
+
+            $len = strlen($prefijo);
+
+            $usuarioQuery = \App\Models\Usuario::with('comunidad')
+                ->where(function ($q) use ($codigo_buscado, $prefijo, $len, $numero) {
+                    $q->where('codigo_medidor', 'LIKE', '%' . $codigo_buscado . '%');
+                    $q->orWhere('codigo_socio', $numero);
+                })
+                ->whereHas('comunidad', function ($q) use ($prefijo, $len) {
+                    // Compara las primeras letras del nombre de la comunidad con el prefijo (en mayúsculas)
+                    $q->whereRaw('UPPER(LEFT(nombre, ?)) = ?', [$len, $prefijo]);
+                });
+        }
+
+        $usuario = $usuarioQuery->first();
+
+        if (!$usuario) {
+            return redirect()->route('home')->with('error', 'No se encontró ningún socio. Verifica si el código es correcto.');
+        }
+
+        $historial = \App\Models\Lectura::where('usuario_id', $usuario->id)->latest()->get();
+
+        return view('historial', compact('usuario', 'historial'));
     }
-
-    $historial = \App\Models\Lectura::where('usuario_id', $usuario->id)->latest()->get();
-
-    return view('historial', compact('usuario', 'historial'));
-}
 
     // Muestra el panel de administración
     public function index(Request $request) {
         $comunidadSeleccionada = $request->get('comunidad_id');
         $comunidades = Comunidad::all();
+        $siguienteCodigoPorComunidad = Usuario::select('comunidad_id')
+            ->selectRaw('MAX(codigo_socio) + 1 as siguiente_codigo')
+            ->groupBy('comunidad_id')
+            ->pluck('siguiente_codigo', 'comunidad_id');
         
         $usuarios = Usuario::with('comunidad')
             ->when($comunidadSeleccionada, function ($query) use ($comunidadSeleccionada) {
@@ -108,7 +141,7 @@ class LecturaController extends Controller
             })
             ->get();
 
-        return view('lecturas.index', compact('usuarios', 'comunidades', 'comunidadSeleccionada'));
+        return view('lecturas.index', compact('usuarios', 'comunidades', 'comunidadSeleccionada', 'siguienteCodigoPorComunidad'));
     }
 
     // Guarda una nueva lectura
@@ -118,9 +151,11 @@ class LecturaController extends Controller
             'lectura_actual' => 'required|numeric',
             'mostrar_mensaje_corte' => 'nullable|boolean',
         ]);
+        $usuario = Usuario::findOrFail($data['usuario_id']);
 
         $anterior = Lectura::where('usuario_id', $data['usuario_id'])->latest()->first();
-        $lectura_anterior = $anterior ? $anterior->lectura_actual : 0;
+        // Si existe una lectura previa, usarla; si no, usar la lectura_inicial del usuario como lectura anterior
+        $lectura_anterior = $anterior ? $anterior->lectura_actual : ($usuario->lectura_inicial ?? 0);
         $consumo_mes = max(0, $data['lectura_actual'] - $lectura_anterior);
         $total_pagar = $this->calcularTotalPagar($consumo_mes);
 
@@ -137,44 +172,50 @@ class LecturaController extends Controller
         return back()->with('success', 'Lectura registrada correctamente.');
     }
 
+    public function storeComunidad(Request $request)
+    {
+        $request->merge([
+            'nombre' => trim((string) $request->input('nombre')),
+        ]);
+
+        $data = $request->validate([
+            'nombre' => 'required|string|max:255|unique:comunidades,nombre',
+        ]);
+
+        $comunidad = Comunidad::create([
+            'nombre' => $data['nombre'],
+        ]);
+
+        return redirect()
+            ->route('lecturas.index', ['comunidad_id' => $comunidad->id])
+            ->with('success', 'Comunidad registrada correctamente.');
+    }
+
     // Guarda un nuevo socio
     public function storeUsuario(Request $request) {
         $data = $request->validate([
             'nombre' => 'required',
-            'comunidad_id' => 'required',
-            'codigo_socio' => [
-                'required',
-                Rule::unique('usuarios')->where(function ($query) use ($request) {
-                    return $query->where('comunidad_id', $request->comunidad_id);
-                }),
-            ],
+            'comunidad_id' => 'required|exists:comunidades,id',
             'codigo_medidor' => 'required|unique:usuarios,codigo_medidor',
             'lectura_inicial' => 'required|numeric|min:0',
         ]);
 
-        $lecturaInicial = (float) $data['lectura_inicial'];
+        DB::transaction(function () use ($data) {
+            $lecturaInicial = (float) $data['lectura_inicial'];
+            $siguienteCodigo = ((int) Usuario::where('comunidad_id', $data['comunidad_id'])
+                ->lockForUpdate()
+                ->max('codigo_socio')) + 1;
 
-        $usuario = Usuario::create([
-            'nombre' => $data['nombre'],
-            'comunidad_id' => $data['comunidad_id'],
-            'codigo_socio' => $data['codigo_socio'],
-            'codigo_medidor' => $data['codigo_medidor'],
-            'lectura_inicial' => $lecturaInicial,
-        ]);
+            $usuario = Usuario::create([
+                'nombre' => $data['nombre'],
+                'comunidad_id' => $data['comunidad_id'],
+                'codigo_socio' => $siguienteCodigo,
+                'codigo_medidor' => $data['codigo_medidor'],
+                'lectura_inicial' => $lecturaInicial,
+            ]);
+        });
 
-        $consumo_mes = max(0, $lecturaInicial);
-        $total_pagar = $this->calcularTotalPagar($consumo_mes);
-
-        Lectura::create([
-            'usuario_id' => $usuario->id,
-            'mes' => now()->month,
-            'anio' => now()->year,
-            'lectura_actual' => $lecturaInicial,
-            'consumo_mes' => $consumo_mes,
-            'total_pagar' => $total_pagar,
-        ]);
-
-        return back()->with('success', 'Socio registrado con su lectura inicial.');
+        return back()->with('success', 'Socio registrado. La boleta se generará cuando ingrese la lectura y presione "Generar Boleta".');
     }
 
     protected function calcularTotalPagar(int $consumo_mes): float

@@ -20,6 +20,7 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::get('/dashboard', [LecturaController::class, 'dashboard'])->name('dashboard');
     Route::get('/lecturas', [LecturaController::class, 'index'])->name('lecturas.index');
     Route::post('/lecturas/store', [LecturaController::class, 'store'])->name('lecturas.store');
+    Route::post('/comunidades/crear', [LecturaController::class, 'storeComunidad'])->name('comunidades.store');
     Route::post('/usuarios/crear', [LecturaController::class, 'storeUsuario'])->name('usuarios.store');
     Route::get('/factura/{id}', [LecturaController::class, 'printFactura'])->name('factura.print');
     Route::post('/facturas-lote', [LecturaController::class, 'generarFacturasLote'])->name('facturas.lote');

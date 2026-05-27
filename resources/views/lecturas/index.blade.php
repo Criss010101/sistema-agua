@@ -104,6 +104,26 @@
             background-color: #ffffff;
             border-radius: 0 4px 4px 0;
         }
+        .btn-add-community {
+            width: 100%;
+            border: 1px dashed #334155;
+            background: rgba(99, 102, 241, 0.08);
+            color: #c7d2fe;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 16px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+        .btn-add-community:hover {
+            background: rgba(99, 102, 241, 0.18);
+            border-color: #6366f1;
+            color: #ffffff;
+        }
 
         /* CONTENEDOR PRINCIPAL DERECHO */
         .main-content {
@@ -345,6 +365,9 @@
             <a href="{{ route('lecturas.index') }}" class="nav-item-link active"><i class="fa-solid fa-droplet"></i> Registro de Lecturas</a>
             
             <div class="menu-section-title">Comunidades</div>
+            <button type="button" class="btn-add-community" data-bs-toggle="modal" data-bs-target="#modalComunidad">
+                <i class="fa-solid fa-plus"></i> A&ntilde;adir Comunidad
+            </button>
             <a href="{{ route('lecturas.index') }}" class="nav-item-link {{ !$comunidadSeleccionada ? 'fw-bold text-white' : '' }}">
                 <i class="fa-solid fa-globe"></i> Mostrar Todas
             </a>
@@ -400,6 +423,12 @@
                 </div>
             @endif
 
+            @if($errors->any())
+                <div class="alert alert-danger border-0 shadow-sm p-3 mb-4" style="border-radius: 12px;">
+                    <i class="fa-solid fa-circle-exclamation me-2"></i> {{ $errors->first() }}
+                </div>
+            @endif
+
             <div class="search-wrapper">
                 <div class="search-container">
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -423,6 +452,9 @@
                                     <span>Socio: <strong class="text-dark">#{{ $usuario->codigo_socio }}</strong></span>
                                     <span>Comunidad: <span class="meta-badge">📍 {{ $usuario->comunidad->nombre ?? 'Sin especificar' }}</span></span>
                                     <span>Medidor: <span class="medidor-badge">{{ $usuario->codigo_medidor }}</span></span>
+                                    @if(isset($usuario->lectura_inicial) && $usuario->lectura_inicial > 0)
+                                        <span title="Lectura inicial registrada" class="meta-badge">Lectura inicial: {{ (float) $usuario->lectura_inicial }} m³</span>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -461,6 +493,32 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalComunidad" tabindex="-1" aria-labelledby="modalComunidadLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header border-0 pt-4 px-4">
+                    <h5 class="modal-title fw-bold text-dark" id="modalComunidadLabel">
+                        <i class="fa-solid fa-building me-2 text-primary"></i>A&ntilde;adir Comunidad
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('comunidades.store') }}" method="POST">
+                    @csrf
+                    <div class="modal-body px-4 pb-4">
+                        <div class="mb-3">
+                            <label class="form-label text-secondary fw-semibold small">Nombre de la comunidad</label>
+                            <input type="text" name="nombre" class="form-control" placeholder="Ej. Nueva Comunidad" required maxlength="255" style="border-radius: 8px; background:white; color:black;">
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 bg-light px-4 py-3" style="border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
+                        <button type="button" class="btn btn-secondary fw-semibold" data-bs-dismiss="modal" style="border-radius: 8px;">Cancelar</button>
+                        <button type="submit" class="btn btn-primary fw-semibold" style="border-radius: 8px; background-color: var(--sidebar-active); border: none;">Guardar Comunidad</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="modalUsuario" tabindex="-1" aria-labelledby="modalUsuarioLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content shadow-lg">
@@ -477,17 +535,17 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label text-secondary fw-semibold small">Comunidad</label>
-                            <select name="comunidad_id" class="form-select" required style="border-radius: 8px; background:white; color:black;">
-                                <option value="" selected disabled>-- Selecciona una comunidad --</option>
+                            <select name="comunidad_id" id="comunidadSocioSelect" class="form-select" required style="border-radius: 8px; background:white; color:black;">
+                                <option value="" {{ $comunidadSeleccionada ? '' : 'selected' }} disabled>-- Selecciona una comunidad --</option>
                                 @foreach($comunidades as $comunidad)
-                                    <option value="{{ $comunidad->id }}">{{ $comunidad->nombre }}</option>
+                                    <option value="{{ $comunidad->id }}" {{ (string) $comunidadSeleccionada === (string) $comunidad->id ? 'selected' : '' }}>{{ $comunidad->nombre }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label text-secondary fw-semibold small">Código de Socio</label>
-                                <input type="text" name="codigo_socio" class="form-control" placeholder="Ej. 1" required style="border-radius: 8px; background:white; color:black;">
+                                <label class="form-label text-secondary fw-semibold small">C&oacute;digo de Socio</label>
+                                <input type="text" id="codigoSocioAutomatico" class="form-control" value="Autom&aacute;tico" readonly style="border-radius: 8px; background:#f8fafc; color:#475569;">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label text-secondary fw-semibold small">Código del Medidor</label>
@@ -560,13 +618,34 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        const siguienteCodigoPorComunidad = @json($comunidades->mapWithKeys(fn ($comunidad) => [
+            $comunidad->id => (int) ($siguienteCodigoPorComunidad[$comunidad->id] ?? 1),
+        ]));
+
         document.addEventListener('DOMContentLoaded', function () {
-            if (window.location.hash === '#modalUsuario' || window.location.hash === '#modalFacturasLote') {
+            if (window.location.hash === '#modalUsuario' || window.location.hash === '#modalFacturasLote' || window.location.hash === '#modalComunidad') {
                 const modalElement = document.querySelector(window.location.hash);
                 if (modalElement) {
                     new bootstrap.Modal(modalElement).show();
                 }
             }
+
+            const comunidadSelect = document.getElementById('comunidadSocioSelect');
+            const codigoSocioInput = document.getElementById('codigoSocioAutomatico');
+
+            const actualizarCodigoSocio = () => {
+                if (!comunidadSelect || !codigoSocioInput) {
+                    return;
+                }
+
+                const comunidadId = comunidadSelect.value;
+                codigoSocioInput.value = comunidadId
+                    ? `#${siguienteCodigoPorComunidad[comunidadId] ?? 1}`
+                    : 'Automático';
+            };
+
+            actualizarCodigoSocio();
+            comunidadSelect?.addEventListener('change', actualizarCodigoSocio);
         });
     </script>
 </body>

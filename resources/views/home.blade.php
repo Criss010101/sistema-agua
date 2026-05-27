@@ -36,7 +36,7 @@
         <div class="hero-card text-center">
             <div class="mb-3" style="font-size: 3rem; color: #6366f1;"><i class="fa-solid fa-droplet"></i></div>
             <h2 class="fw-bold text-dark mb-1">Consulta de Historial y Pagos</h2>
-            <p class="text-muted mb-4">Ingrese el número de su medidor para verificar sus estados de cuenta de agua.</p>
+            <p class="text-muted mb-4">Ingrese el número de su medidor o su código de socio para verificar sus estados de cuenta de agua.</p>
 
             @if(session('error'))
                 <div class="alert alert-danger border-0 p-3 mb-4" style="border-radius: 12px; background-color: #fee2e2; color: #991b1b;">
@@ -46,7 +46,7 @@
 
             <form action="{{ route('comunidad.consulta') }}" method="GET">
                 <div class="position-relative mb-3">
-                    <input type="text" name="codigo_medidor" class="form-control" placeholder="Ej. MED-5592" required style="border-radius: 12px; padding: 14px; text-align: center; font-weight: 600; font-size: 1.1rem; border: 1px solid #e2e8f0;">
+                    <input type="text" name="codigo_medidor" class="form-control" placeholder="Ej. MED-5592 o 123" required style="border-radius: 12px; padding: 14px; text-align: center; font-weight: 600; font-size: 1.1rem; border: 1px solid #e2e8f0;">
                 </div>
                 <button type="submit" class="btn btn-search w-100 py-3 shadow-sm">
                     <i class="fa-solid fa-magnifying-glass me-2"></i> Consultar Estado
