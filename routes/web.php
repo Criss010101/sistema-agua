@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\LecturaController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SetupController;
 use App\Models\Administrador;
 use Illuminate\Support\Facades\Route;
 
@@ -50,3 +51,7 @@ Route::get('/fix-admin-pass', function () {
 
     return 'Contraseña del administrador actualizada a 123456. Elimina /fix-admin-pass después.';
 });
+
+// Rutas para setup inicial de administrador (solo si no existe ninguno)
+Route::get('/setup-admin', [SetupController::class, 'showForm'])->name('setup.show');
+Route::post('/setup-admin', [SetupController::class, 'store'])->name('setup.store');
