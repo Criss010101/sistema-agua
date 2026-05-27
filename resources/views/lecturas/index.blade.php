@@ -23,8 +23,8 @@
             margin: 0;
             padding: 0;
             display: flex;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
         /* BARRA LATERAL (SIDEBAR) ESILO UAGRM */
@@ -130,8 +130,9 @@
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            min-height: 100vh;
             overflow-y: auto;
+            min-width: 0;
         }
 
         /* BARRA SUPERIOR (TOPBAR) */
@@ -141,7 +142,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 16px;
             border-bottom: 1px solid #e2e8f0;
+            flex-wrap: wrap;
         }
         .topbar-title h2 {
             font-size: 1.4rem;
@@ -186,6 +189,30 @@
             max-width: 1100px;
             width: 100%;
             margin: 0 auto;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            min-width: 0;
+        }
+
+        .search-form {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .socio-form {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         /* BARRA DE BÚSQUEDA Y FILTRADO */
@@ -306,6 +333,8 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
         .input-m3 {
             width: 140px;
@@ -348,6 +377,166 @@
             height: 16px;
             accent-color: #ef4444;
         }
+
+        @media (max-width: 991.98px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                width: 100%;
+            }
+
+            .topbar,
+            .content-body {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .topbar-title h2 {
+                font-size: 1.2rem;
+            }
+
+            .topbar-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .search-form {
+                flex-wrap: wrap;
+            }
+
+            .search-form > div[style*="width: 240px"] {
+                width: 100% !important;
+                margin-right: 0 !important;
+            }
+
+            .search-container {
+                width: 100%;
+            }
+
+            .btn-filter-dark {
+                width: 100%;
+                justify-content: center;
+                min-height: 44px;
+                margin-left: 0 !important;
+            }
+
+            .socio-card {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 18px;
+            }
+
+            .socio-info-block {
+                align-items: flex-start;
+            }
+
+            .socio-meta {
+                flex-wrap: wrap;
+                row-gap: 8px;
+            }
+
+            .socio-actions {
+                justify-content: stretch;
+            }
+
+            .socio-form {
+                width: 100%;
+            }
+
+            .socio-form .input-m3,
+            .socio-form .corte-option,
+            .socio-form .btn-boleta,
+            .socio-form a.btn-boleta {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .input-m3 {
+                width: 100%;
+            }
+
+            .corte-option {
+                min-height: 44px;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            body {
+                display: block;
+            }
+
+            .content-body {
+                padding: 16px;
+            }
+
+            .topbar {
+                padding: 14px 16px;
+            }
+
+            .topbar-title h2 {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .topbar-actions .btn,
+            .topbar-actions .btn-link,
+            .topbar-actions form {
+                width: 100%;
+            }
+
+            .topbar-actions .btn {
+                justify-content: center;
+            }
+
+            .user-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .socio-card {
+                padding: 18px;
+                border-radius: 14px;
+            }
+
+            .socio-info-block {
+                gap: 14px;
+            }
+
+            .socio-icon-box {
+                width: 44px;
+                height: 44px;
+                flex-shrink: 0;
+            }
+
+            .socio-details h4 {
+                font-size: 1rem;
+                line-height: 1.25;
+                word-break: break-word;
+            }
+
+            .socio-meta {
+                font-size: 0.8rem;
+            }
+
+            .meta-badge,
+            .medidor-badge {
+                display: inline-flex;
+                max-width: 100%;
+                word-break: break-word;
+            }
+
+            .search-input {
+                font-size: 1rem;
+            }
+
+            .btn-filter-dark,
+            .btn-boleta {
+                min-height: 46px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -388,7 +577,7 @@
                 <p>Gestión de lecturas y control de consumo mensual</p>
             </div>
             
-            <div class="d-flex align-items-center gap-3">
+            <div class="topbar-actions">
                 <button type="button" class="btn btn-outline-primary fw-semibold px-3 py-1.5" style="border-radius: 8px; font-size: 0.85rem;" data-bs-toggle="modal" data-bs-target="#modalUsuario">
                     ➕ Nuevo Socio
                 </button>
@@ -430,7 +619,7 @@
             @endif
 
             <div class="search-wrapper">
-                <form action="{{ route('lecturas.index') }}" method="GET" class="d-flex w-100 align-items-center">
+                <form action="{{ route('lecturas.index') }}" method="GET" class="search-form">
                     <div style="width: 240px; margin-right:12px">
                         <select name="comunidad_id" class="form-select" style="border-radius: 12px; padding: 10px; background:white; color:black;">
                             <option value="">Todas las comunidades</option>
@@ -469,11 +658,11 @@
                             </div>
                         </div>
 
-                        <div class="socio-actions">
-                            <form action="{{ route('lecturas.store') }}" method="POST" class="d-flex align-items-center gap-2">
+                            <div class="socio-actions">
+                                <form action="{{ route('lecturas.store') }}" method="POST" class="socio-form">
                                 @csrf
                                 <input type="hidden" name="usuario_id" value="{{ $usuario->id }}">
-                                <input type="number" name="lectura_actual" class="input-m3" placeholder="M³ Actuales" required min="0">
+                                <input type="number" name="lectura_actual" class="input-m3" placeholder="M³ Actuales" required min="0" inputmode="numeric">
                                 <label class="corte-option" title="Mostrar u ocultar el aviso de corte en la boleta">
                                     <input type="checkbox" name="mostrar_mensaje_corte" value="1" checked>
                                     Aviso de corte
