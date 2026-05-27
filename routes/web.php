@@ -55,3 +55,9 @@ Route::get('/fix-admin-pass', function () {
 // Rutas para setup inicial de administrador (solo si no existe ninguno)
 Route::get('/setup-admin', [SetupController::class, 'showForm'])->name('setup.show');
 Route::post('/setup-admin', [SetupController::class, 'store'])->name('setup.store');
+
+// RUTA TEMPORAL: Elimina todos los administradores. BORRAR esta ruta tras usarla.
+Route::get('/delete-admins', function () {
+    Administrador::truncate();
+    return 'Se eliminaron todos los administradores. Elimina la ruta /delete-admins ahora.';
+});

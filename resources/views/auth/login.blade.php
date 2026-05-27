@@ -19,25 +19,53 @@
         <h4 class="fw-bold text-white text-center mb-1">Panel de Control</h4>
         <p class="text-center small mb-4" style="color: #94a3b8;">Acceso autorizado exclusivo para operadores</p>
 
+        @php
+            $hasAdmin = \App\Models\Administrador::exists();
+        @endphp
+
         @if($errors->any())
             <div class="alert alert-danger border-0 p-2 text-center small mb-3" style="background: #ef4444; color: white; border-radius: 8px;">
                 {{ $errors->first() }}
             </div>
         @endif
 
-        <form action="{{ route('login.post') }}" method="POST">
-            @csrf
-            <div class="mb-3">
-                <label class="form-label small fw-semibold" style="color: #94a3b8;">Usuario</label>
-                <input type="text" name="usuario" class="form-control" placeholder="Ej. admin" required autocomplete="off">
+        @if($hasAdmin)
+            <form action="{{ route('login.post') }}" method="POST">
+                @csrf
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold" style="color: #94a3b8;">Usuario</label>
+                    <input type="text" name="usuario" class="form-control" placeholder="Ej. admin" required autocomplete="off">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label small fw-semibold" style="color: #94a3b8;">Contraseña</label>
+                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-indigo w-100 py-2.5 mb-2">Ingresar al Sistema</button>
+                <a href="{{ route('home') }}" class="btn btn-link w-100 text-center small p-0 text-decoration-none" style="color: #94a3b8;">Volver al inicio</a>
+            </form>
+        @else
+            <div class="alert alert-warning border-0 p-2 text-center small mb-3" style="background: #fcd34d; color: #1f2937; border-radius: 8px;">
+                No existe ningún administrador. Crea la cuenta inicial para acceder al panel.
             </div>
-            <div class="mb-4">
-                <label class="form-label small fw-semibold" style="color: #94a3b8;">Contraseña</label>
-                <input type="password" name="password" class="form-control" placeholder="••••••••" required>
-            </div>
-            <button type="submit" class="btn btn-indigo w-100 py-2.5 mb-2">Ingresar al Sistema</button>
-            <a href="{{ route('home') }}" class="btn btn-link w-100 text-center small p-0 text-decoration-none" style="color: #94a3b8;">Volver al inicio</a>
-        </form>
+
+            <form action="{{ route('setup.store') }}" method="POST">
+                @csrf
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold" style="color: #94a3b8;">Usuario</label>
+                    <input type="text" name="usuario" class="form-control" placeholder="Ej. admin" required autocomplete="off" value="admin">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold" style="color: #94a3b8;">Contraseña</label>
+                    <input type="password" name="password" class="form-control" placeholder="Contraseña" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label small fw-semibold" style="color: #94a3b8;">Confirmar Contraseña</label>
+                    <input type="password" name="password_confirmation" class="form-control" placeholder="Repite la contraseña" required>
+                </div>
+                <button type="submit" class="btn btn-indigo w-100 py-2.5 mb-2">Crear Cuenta Administrador</button>
+                <a href="{{ route('home') }}" class="btn btn-link w-100 text-center small p-0 text-decoration-none" style="color: #94a3b8;">Volver al inicio</a>
+            </form>
+        @endif
     </div>
 </body>
 </html>
