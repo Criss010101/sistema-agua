@@ -7,16 +7,12 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     public function up()
-{
-    Schema::table('usuarios', function (Blueprint $table) {
-        $table->decimal('lectura_inicial', 10, 2)->default(0);
-    });
-}
+    {
+        // Columna ya creada en la migración 2026_05_25_132512_create_usuarios_table.php
+    }
 
 public function down()
-{
-    Schema::table('usuarios', function (Blueprint $table) {
-        $table->dropColumn('lectura_inicial');
-    });
-}
+    {
+        // No es necesario revertir nada aquí
+    }
 };
