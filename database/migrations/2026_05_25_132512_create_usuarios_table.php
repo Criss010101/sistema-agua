@@ -14,6 +14,7 @@ return new class extends Migration
         $table->integer('codigo_socio'); // 1, 2, 3... secuencial por comunidad
         $table->string('nombre');
         $table->string('codigo_medidor')->unique(); // El número físico del aparato
+        $table->decimal('lectura_inicial', 15, 2)->default(0);
         $table->timestamps();
         
         // Evita que se repita el mismo código de socio dentro de la misma comunidad
