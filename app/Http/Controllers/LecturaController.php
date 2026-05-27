@@ -155,7 +155,7 @@ class LecturaController extends Controller
                     }
                 });
             })
-            ->get();
+            ->paginate(15);
 
         return view('lecturas.index', compact('usuarios', 'comunidades', 'comunidadSeleccionada', 'siguienteCodigoPorComunidad', 'search'));
     }
@@ -317,7 +317,7 @@ class LecturaController extends Controller
                 ->join('usuarios', 'lecturas.usuario_id', '=', 'usuarios.id')
                 ->orderBy('usuarios.codigo_socio')
                 ->select('lecturas.*')
-                ->get();
+                ->paginate(20);
         }
 
         return view('pagos.index', compact(
