@@ -197,6 +197,18 @@
             margin: 2px 0 0 0;
         }
 
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
         .user-badge {
             background-color: #e0e7ff;
             color: #4f46e5;
@@ -486,7 +498,12 @@
 
             .topbar-actions {
                 width: 100%;
-                justify-content: flex-start;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .user-profile {
+                order: -1; /* Mantiene al usuario en una posición prominente si es necesario */
             }
 
             .search-form {
@@ -680,18 +697,24 @@
                 <p>Gestión de lecturas y control de consumo mensual</p>
             </div>
             <div class="topbar-actions">
-                <button type="button" class="btn btn-outline-primary fw-semibold px-3 py-1.5" style="border-radius: 8px; font-size: 0.85rem;" data-bs-toggle="modal" data-bs-target="#modalUsuario">
-                    ➕ Nuevo Socio
-                </button>
-                <button type="button" class="btn btn-outline-success fw-semibold px-3 py-1.5" style="border-radius: 8px; font-size: 0.85rem;" data-bs-toggle="modal" data-bs-target="#modalFacturasLote">
-                    🖨️ Generar Facturas
-                </button>
-                <a href="{{ route('pagos.index', ['comunidad_id' => $comunidadSeleccionada]) }}" class="btn btn-outline-warning fw-semibold px-3 py-1.5" style="border-radius: 8px; font-size: 0.85rem;">
-                    ✅ Pagos
-                </a>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-outline-primary fw-semibold px-3 py-1.5" style="border-radius: 8px; font-size: 0.85rem;" data-bs-toggle="modal" data-bs-target="#modalUsuario">
+                        ➕ Nuevo Socio
+                    </button>
+                    <button type="button" class="btn btn-outline-success fw-semibold px-3 py-1.5" style="border-radius: 8px; font-size: 0.85rem;" data-bs-toggle="modal" data-bs-target="#modalFacturasLote">
+                        🖨️ Generar Facturas
+                    </button>
+                    <a href="{{ route('pagos.index', ['comunidad_id' => $comunidadSeleccionada]) }}" class="btn btn-outline-warning fw-semibold px-3 py-1.5" style="border-radius: 8px; font-size: 0.85rem;">
+                        ✅ Pagos
+                    </a>
+                </div>
 
-                <span class="user-badge">OPERADOR</span>
-                <div class="user-avatar">SA</div>
+                <div class="user-profile">
+                    <span class="user-name d-none d-sm-inline">{{ auth('admin')->user()->usuario }}</span>
+                    <div class="user-avatar" title="{{ auth('admin')->user()->usuario }}">
+                        {{ strtoupper(substr(auth('admin')->user()->usuario, 0, 2)) }}
+                    </div>
+                </div>
             </div>
         </div>
 
