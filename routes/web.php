@@ -4,6 +4,7 @@ use App\Http\Controllers\LecturaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SetupController;
 use App\Models\Administrador;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 // --- VISTAS PÚBLICAS (Para los Socios) ---
@@ -34,3 +35,20 @@ Route::middleware(['auth:admin'])->group(function () {
 // Rutas para setup inicial de administrador (solo si no existe ninguno)
 Route::get('/setup-admin', [SetupController::class, 'showForm'])->name('setup.show');
 Route::post('/setup-admin', [SetupController::class, 'store'])->name('setup.store');
+
+// RUTA SECRETA PARA REINICIAR TODO EL SISTEMA
+Route::get('/limpiar-base-de-datos-secreta', function () {
+    // Solo permitimos esto si estamos seguros
+    try {
+        // migrate:fresh borra todas las tablas y las crea de nuevo
+        // --force es necesario para que funcione en producción (Render)
+        Artisan::call('migrate:fresh', ['--force' => true]);
+
+        // Ejecutamos los seeders para volver a crear el usuario administrador
+        Artisan::call('db:seed', ['--force' => true]);
+
+        return "La base de datos ha sido limpiada por completo. El administrador ha sido recreado.";
+    } catch (\Exception $e) {
+        return "Error al intentar limpiar la base de datos: " . $e->getMessage();
+    }
+});
