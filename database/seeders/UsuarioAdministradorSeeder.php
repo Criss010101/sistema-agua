@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Administrador;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class UsuarioAdministradorSeeder extends Seeder
 {
@@ -13,9 +12,13 @@ class UsuarioAdministradorSeeder extends Seeder
      */
     public function run(): void
     {
-        Administrador::firstOrCreate(
+        // Usamos updateOrCreate para forzar la contraseña indicada.
+        // Nota: el modelo `Administrador` tiene el cast `password => 'hashed'`,
+        // por lo que debemos pasar la contraseña en texto plano y el modelo
+        // la hashará automáticamente.
+        Administrador::updateOrCreate(
             ['usuario' => env('ADMIN_DEFAULT_USER', 'admin')],
-            ['password' => Hash::make(env('ADMIN_DEFAULT_PASSWORD', '123456'))]
+            ['password' => env('ADMIN_DEFAULT_PASSWORD', '123456')]
         );
     }
 }
