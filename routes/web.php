@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\LecturaController;
 use App\Http\Controllers\AuthController;
+use App\Models\Administrador;
 use Illuminate\Support\Facades\Route;
 
 // --- VISTAS PÚBLICAS (Para los Socios) ---
@@ -37,4 +38,15 @@ Route::get('/ejecutar-seeder-secreto', function () {
     } catch (\Exception $e) {
         return 'Hubo un error: ' . $e->getMessage();
     }
+});
+
+// RUTA TEMPORAL: restablece/crea el administrador con usuario 'admin' y contraseña '123456'.
+// Borra esta ruta después de usarla por seguridad.
+Route::get('/fix-admin-pass', function () {
+    Administrador::updateOrCreate(
+        ['usuario' => 'admin'],
+        ['password' => '123456']
+    );
+
+    return 'Contraseña del administrador actualizada a 123456. Elimina /fix-admin-pass después.';
 });
