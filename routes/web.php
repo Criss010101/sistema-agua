@@ -52,3 +52,29 @@ Route::get('/limpiar-base-de-datos-secreta', function () {
         return "Error al intentar limpiar la base de datos: " . $e->getMessage();
     }
 });
+
+// RUTA SECRETA PARA RESTABLECER SOLO EL ADMINISTRADOR (Sin borrar datos)
+Route::get('/restablecer-admin-secreto', function () {
+    try {
+        // Ejecutamos específicamente el seeder que gestiona el administrador
+        Artisan::call('db:seed', [
+            '--class' => 'UsuarioAdministradorSeeder',
+            '--force' => true
+        ]);
+        return "El acceso del administrador ha sido restablecido (admin / 123456). Los datos de socios y lecturas NO han sido afectados.";
+    } catch (\Exception $e) {
+        return "Error al restablecer el administrador: " . $e->getMessage();
+    }
+});
+
+// RUTA SECRETA PARA PREPARAR ENTREGA (Borra el admin actual para que el cliente cree el suyo)
+Route::get('/preparar-entrega-cliente-secreto', function () {
+    try {
+        // Borramos todos los administradores existentes (Socios y lecturas permanecen intactos)
+        Administrador::query()->delete();
+
+        return "Sistema preparado para entrega. Se han eliminado las credenciales de administrador. Al intentar entrar al sistema, se le pedirá al cliente que cree su cuenta nueva.";
+    } catch (\Exception $e) {
+        return "Error al preparar la entrega: " . $e->getMessage();
+    }
+});

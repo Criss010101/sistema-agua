@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller
 {
     public function showLogin() {
+        // Si no existe ningún administrador, redirigir automáticamente al setup
+        if (\App\Models\Administrador::count() === 0) {
+            return redirect()->route('setup.show');
+        }
+
         return view('auth.login');
     }
 
