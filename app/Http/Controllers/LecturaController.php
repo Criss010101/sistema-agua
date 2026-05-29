@@ -276,7 +276,9 @@ class LecturaController extends Controller
             ? request()->get('mensaje_corte', 'En corte por falta de cancelacion del servicio basico de agua ( 2 meses).')
             : null;
 
-        return view('factura', compact('lectura', 'lecturaAnteriorValor', 'historico', 'fechaCobranza', 'mensajeCorte'));
+        $diasConsumo = $lectura->dias_consumo;
+
+        return view('factura', compact('lectura', 'lecturaAnteriorValor', 'historico', 'fechaCobranza', 'mensajeCorte', 'diasConsumo'));
     }
 
     public function generarFacturasLote(Request $request)
@@ -298,6 +300,8 @@ class LecturaController extends Controller
             ->get();
 
         $mensajeCorte = 'En corte por falta de cancelacion del servicio basico de agua ( 2 meses).';
+        // Usamos la primera lectura del lote para obtener los días del mes de forma consistente
+        $diasConsumo = $lecturas->first() ? $lecturas->first()->dias_consumo : \Carbon\Carbon::createFromDate($data['anio'], $data['mes'], 1)->daysInMonth;
 
         return view('facturas-lote', [
             'lecturas' => $lecturas,
@@ -305,6 +309,7 @@ class LecturaController extends Controller
             'mensajeCorte' => $mensajeCorte,
             'mesSeleccionado' => $data['mes'],
             'anioSeleccionado' => $data['anio'],
+            'diasConsumo' => $diasConsumo,
         ]);
     }
 

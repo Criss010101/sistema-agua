@@ -84,7 +84,7 @@
                 </td>
                 <td class="border border-black p-1">{{ $lectura->created_at->format('d/m/Y') }}</td>
                 <td class="border border-black p-1">{{ $lectura->created_at->addDays(15)->format('d/m/Y') }}</td>
-                <td class="border border-black p-1">38 DIAS</td>
+                <td class="border border-black p-1">{{ $diasConsumo }} DIAS</td>
                 <td class="border border-black p-1">{{ $lectura->usuario->codigo_medidor }}</td>
             </tr>
             <tr>

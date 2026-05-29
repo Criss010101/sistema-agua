@@ -35,4 +35,9 @@ class Lectura extends Model
     {
         return max(0, $this->lectura_actual - $this->lectura_anterior);
     }
+
+    public function getDiasConsumoAttribute(): int
+    {
+        return \Carbon\Carbon::createFromDate($this->anio, $this->mes, 1)->daysInMonth;
+    }
 }
