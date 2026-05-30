@@ -146,17 +146,6 @@
                             {{ $lectura->consumo_mes > 10 ? ($lectura->consumo_mes - 10) * 3 : 0 }} Bs
                         </td>
                     </tr>
-                    @if($lectura->multas != null && $lectura->multas != '')
-                        @php $listaMultas = explode(',', $lectura->multas); @endphp
-                        @foreach($listaMultas as $m)
-                            @if(!empty(trim($m)))
-                                <tr class="bg-yellow-200" style="-webkit-print-color-adjust: exact;">
-                                    <td class="border border-black p-1 uppercase font-bold">{{ trim($m) }}</td>
-                                    <td class="border border-black p-1 text-right font-bold">50.00 Bs</td>
-                                </tr>
-                            @endif
-                        @endforeach
-                    @endif
                 </table>
             </div>
 

@@ -178,9 +178,8 @@ class LecturaController extends Controller
                          ->withInput();
         }
 
-        $multasArr = array_filter($request->input('multas', []));
         $consumo_mes = max(0, $data['lectura_actual'] - $lectura_anterior);
-        $total_pagar = $this->calcularTotalPagar($consumo_mes) + (count($multasArr) * 50.00);
+        $total_pagar = $this->calcularTotalPagar($consumo_mes);
 
         Lectura::create([
             'usuario_id' => $data['usuario_id'],
@@ -189,7 +188,6 @@ class LecturaController extends Controller
             'lectura_actual' => $data['lectura_actual'],
             'consumo_mes' => $consumo_mes,
             'total_pagar' => $total_pagar,
-            'multas' => count($multasArr) > 0 ? implode(',', $multasArr) : null,
             'mostrar_mensaje_corte' => $request->boolean('mostrar_mensaje_corte'),
         ]);
 
@@ -292,21 +290,13 @@ class LecturaController extends Controller
             'fecha_cobranza' => 'required|string',
         ]);
 
-        $lecturas = Lectura::with(['usuario.comunidad'])
-            ->whereHas('usuario', function ($query) use ($data) {
-                $query->where('comunidad_id', $data['comunidad_id']);
-            })
+        $lecturas = Lectura::whereHas('usuario', function ($query) use ($data) {
+            $query->where('comunidad_id', $data['comunidad_id']);
+        })
             ->where('mes', $data['mes'])
             ->where('anio', $data['anio'])
-            ->join('usuarios', 'lecturas.usuario_id', '=', 'usuarios.id')
-            ->select('lecturas.*')
-            ->orderBy('usuarios.codigo_socio')
-            ->get()
-            ->map(function ($lectura) {
-                // Agregamos el valor de la lectura anterior para que esté disponible en cada factura del lote
-                $lectura->lectura_anterior_valor = $lectura->lectura_actual - $lectura->consumo_mes;
-                return $lectura;
-            });
+            ->with(['usuario.comunidad'])
+            ->get();
 
         $mensajeCorte = $request->get('mensaje_corte', 'En corte por falta de cancelacion del servicio basico de agua ( 2 meses).');
         // Usamos la primera lectura del lote para obtener los días del mes de forma consistente
@@ -398,21 +388,13 @@ class LecturaController extends Controller
         ]);
 
         $comunidad = Comunidad::findOrFail($data['comunidad_id']);
-        $lecturas = Lectura::with(['usuario.comunidad'])
-            ->whereHas('usuario', function ($query) use ($data) {
-                $query->where('comunidad_id', $data['comunidad_id']);
-            })
+        $lecturas = Lectura::whereHas('usuario', function ($query) use ($data) {
+            $query->where('comunidad_id', $data['comunidad_id']);
+        })
             ->where('mes', $data['mes'])
             ->where('anio', $data['anio'])
-            ->join('usuarios', 'lecturas.usuario_id', '=', 'usuarios.id')
-            ->select('lecturas.*', 'usuarios.codigo_socio', 'usuarios.nombre')
-            ->orderBy('usuarios.codigo_socio')
-            ->get()
-            ->map(function ($lectura) {
-                // Optimizamos: La lectura anterior es simplemente la actual menos el consumo registrado
-                $lectura->lectura_anterior_reporte = $lectura->lectura_actual - $lectura->consumo_mes;
-                return $lectura;
-            });
+            ->with(['usuario.comunidad'])
+            ->get();
 
         return view('reportes.comunidad', [
             'comunidad' => $comunidad,
