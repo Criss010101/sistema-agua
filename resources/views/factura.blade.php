@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Aviso de Cobranza - C.A.P.</title>
+    <title>Boleta de Pago - C.A.P.</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         @page { size: letter portrait; margin: 0.12in; }
@@ -33,7 +33,7 @@
         }
         .contenedor-factura h3 { font-size: 9px !important; padding: 2px !important; }
         .contenedor-factura .text-xl { font-size: 16px !important; }
-        .contenedor-factura .bg-yellow-300 { padding: 3px !important; font-size: 8.5px !important; line-height: 1.15 !important; }
+        .contenedor-factura .bg-yellow-300, .contenedor-factura .bg-green-50 { padding: 3px !important; font-size: 8.5px !important; line-height: 1.15 !important; }
 
         @media print {
             .no-imprimir { display: none !important; }
@@ -56,7 +56,7 @@
 
     <div class="no-imprimir w-full max-w-2xl flex justify-between mb-4">
         <a href="{{ route('lecturas.index') }}" class="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800">← Volver</a>
-        <button onclick="window.print()" class="bg-emerald-600 text-white px-6 py-2 rounded font-bold text-sm hover:bg-emerald-700 cursor-pointer">🖨️ Imprimir Aviso</button>
+        <button onclick="window.print()" class="bg-emerald-600 text-white px-6 py-2 rounded font-bold text-sm hover:bg-emerald-700 cursor-pointer">🖨️ Generar Boleta</button>
     </div>
 
     <div class="contenedor-factura bg-white w-full max-w-2xl p-6 border-2 border-gray-800 text-black shadow-2xl rounded-sm">
@@ -64,7 +64,7 @@
         <div class="text-center mb-4">
             <h1 class="text-md font-black text-blue-900 tracking-tight">C.A.P. "18 de Mayo" com. Coronación, La Senda y Cachuela España</h1>
             <p class="text-[11px] font-bold text-cyan-800">Distrito II, Municipio San Javier, Provincia Ñuflo de Chávez, Dpto. Santa Cruz</p>
-            <h2 class="text-sm font-black tracking-widest uppercase border-y-2 border-black py-1 mt-2 bg-gray-50">AVISO DE COBRANZA POR CONSUMO DE AGUA POTABLE - C.A.P. 18 DE MAYO</h2>
+            <h2 class="text-sm font-black tracking-widest uppercase border-y-2 border-black py-1 mt-2 bg-gray-50">BOLETA DE PAGO POR CONSUMO DE AGUA POTABLE - C.A.P. 18 DE MAYO</h2>
         </div>
 
         <table class="w-full border-collapse border border-black text-[12px] mb-3">
@@ -82,8 +82,8 @@
                     @endphp
                     {{ $meses[$lectura->mes] ?? '' }} {{ $lectura->anio }}
                 </td>
-                <td class="border border-black p-1">{{ $lectura->created_at->format('d/m/Y') }}</td>
-                <td class="border border-black p-1">{{ $lectura->created_at->addDays(15)->format('d/m/Y') }}</td>
+                <td class="border border-black p-1">{{ \Carbon\Carbon::create($lectura->anio, $lectura->mes, 28)->format('d/m/Y') }}</td>
+                <td class="border border-black p-1">{{ \Carbon\Carbon::create($lectura->anio, $lectura->mes, 28)->addMonthNoOverflow()->day(10)->format('d/m/Y') }}</td>
                 <td class="border border-black p-1">{{ $diasConsumo }} DIAS</td>
                 <td class="border border-black p-1">{{ $lectura->usuario->codigo_medidor }}</td>
             </tr>
@@ -146,6 +146,14 @@
                             {{ $lectura->consumo_mes > 10 ? ($lectura->consumo_mes - 10) * 3 : 0 }} Bs
                         </td>
                     </tr>
+                    @if(!empty($lectura->multas))
+                        @foreach(explode(', ', $lectura->multas) as $multa)
+                            <tr class="bg-yellow-200">
+                                <td class="border border-black p-1">{{ $multa }}</td>
+                                <td class="border border-black p-1 text-right font-bold">50.00 Bs</td>
+                            </tr>
+                        @endforeach
+                    @endif
                 </table>
             </div>
 
@@ -192,9 +200,12 @@
             </div>
         </div>
 
-        <div class="bg-yellow-300 border-2 border-black p-2 text-center font-sans font-bold text-[11px] leading-tight text-black">
-            @if($mensajeCorte)
-                <span class="text-xs font-black uppercase text-red-700 block mb-0.5">{{ $mensajeCorte }}</span>
+        @php
+            $mesesDeuda = $historico->where('estado', '!=', 'pagado')->count();
+        @endphp
+        <div class="{{ $mesesDeuda >= 2 ? 'bg-yellow-300' : 'bg-green-50' }} border-2 border-black p-2 text-center font-sans font-bold text-[11px] leading-tight text-black">
+            @if($mesesDeuda >= 2)
+                <span class="text-xs font-black uppercase text-red-700 block mb-0.5">En corte por falta de cancelacion del servicio basico de agua ( {{ $mesesDeuda }} meses).</span>
             @endif
             En {{ $lectura->usuario->comunidad->nombre }} se cobrara el servicio de agua el día {{ $fechaCobranza ?? 'JUEVES 6 DE MARZO' }}. A horas 14:00 PM. hasta las 18:00 PM. Lugar de cancelación oficina del comité de agua.
         </div>

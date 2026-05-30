@@ -423,6 +423,27 @@
             background-color: #059669;
         }
 
+        .btn-boleta.registrado {
+            background-color: #64748b;
+            cursor: not-allowed;
+        }
+
+        .btn-multa {
+            background-color: #f59e0b;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .btn-multa:hover {
+            background-color: #d97706;
+            color: white;
+        }
+
         .corte-option {
             display: flex;
             align-items: center;
@@ -552,7 +573,8 @@
             .socio-form .input-m3,
             .socio-form .corte-option,
             .socio-form .btn-boleta,
-            .socio-form a.btn-boleta {
+            .socio-form a.btn-boleta,
+            .btn-multa {
                 width: 100%;
                 justify-content: center;
             }
@@ -702,7 +724,7 @@
                         ➕ Nuevo Socio
                     </button>
                     <button type="button" class="btn btn-outline-success fw-semibold px-3 py-1.5" style="border-radius: 8px; font-size: 0.85rem;" data-bs-toggle="modal" data-bs-target="#modalFacturasLote">
-                        🖨️ Generar Facturas
+                        🖨️ Generar Boletas
                     </button>
                     <a href="{{ route('pagos.index', ['comunidad_id' => $comunidadSeleccionada]) }}" class="btn btn-outline-warning fw-semibold px-3 py-1.5" style="border-radius: 8px; font-size: 0.85rem;">
                         ✅ Pagos
@@ -764,32 +786,29 @@
                                 <div class="socio-meta">
                                     <span>Socio: <strong class="text-dark">#{{ $usuario->codigo_socio }}</strong></span>
                                     <span>Comunidad: <span class="meta-badge">📍 {{ $usuario->comunidad->nombre ?? 'Sin especificar' }}</span></span>
-                                    <span>Medidor: <span class="medidor-badge">{{ $usuario->codigo_medidor }}</span></span>
-                                    @if(isset($usuario->lectura_inicial) && $usuario->lectura_inicial > 0)
-                                        <span title="Lectura inicial registrada" class="meta-badge">Lectura inicial: {{ (float) $usuario->lectura_inicial }} m³</span>
-                                    @endif
                                 </div>
                             </div>
                         </div>
 
                         <div class="socio-actions">
-                            <form action="{{ route('lecturas.store') }}" method="POST" class="socio-form">
+                            @php
+                                $yaRegistrado = $usuario->ultimaLectura && 
+                                               $usuario->ultimaLectura->mes == now()->month && 
+                                               $usuario->ultimaLectura->anio == now()->year;
+                            @endphp
+                            <form action="{{ route('lecturas.store') }}" method="POST" class="socio-form" id="form-socio-{{ $usuario->id }}">
                                 @csrf
                                 <input type="hidden" name="usuario_id" value="{{ $usuario->id }}">
-                                <input type="number" name="lectura_actual" class="input-m3" placeholder="M³ Actuales" required min="0" inputmode="numeric">
-                                <label class="corte-option" title="Mostrar u ocultar el aviso de corte en la boleta">
-                                    <input type="checkbox" name="mostrar_mensaje_corte" value="1" checked>
-                                    Aviso de corte
-                                </label>
-                                <button type="submit" class="btn-boleta">
-                                    <i class="fa-solid fa-file-invoice-dollar me-1"></i> Generar Boleta
+                                <input type="number" name="lectura_actual" class="input-m3" placeholder="M³ Actuales" required min="0" inputmode="numeric" {{ $yaRegistrado ? 'disabled' : '' }}>
+                                <button type="submit" class="btn-boleta {{ $yaRegistrado ? 'registrado' : '' }}" {{ $yaRegistrado ? 'disabled' : '' }}>
+                                    <i class="fa-solid {{ $yaRegistrado ? 'fa-circle-check' : 'fa-file-invoice-dollar' }} me-1"></i> 
+                                    {{ $yaRegistrado ? 'Registrado' : 'Generar Boleta' }}
                                 </button>
-                                @if($usuario->ultimaLectura)
-                                    <a href="{{ route('factura.print', $usuario->ultimaLectura->id) }}" class="btn-boleta" style="background-color: #8b5cf6; text-decoration: none; display: inline-flex; align-items: center;" target="_blank">
-                                        <i class="fa-solid fa-print me-1"></i> Imprimir Factura
-                                    </a>
-                                @endif
                             </form>
+
+                            <button type="button" class="btn-multa" data-bs-toggle="modal" data-bs-target="#modalMulta" data-usuario-id="{{ $usuario->id }}" data-usuario-nombre="{{ $usuario->nombre }}">
+                                <i class="fa-solid fa-scale-balanced me-1"></i> Multa
+                            </button>
                         </div>
                     </div>
                 @empty
@@ -880,7 +899,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content shadow-lg">
                 <div class="modal-header border-0 pt-4 px-4">
-                    <h5 class="modal-title fw-bold text-dark" id="modalFacturasLoteLabel">📄 Generar Facturas en Lote</h5>
+                    <h5 class="modal-title fw-bold text-dark" id="modalFacturasLoteLabel">📄 Generar Boletas en Lote</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="{{ route('facturas.lote') }}" method="POST">
@@ -897,7 +916,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-7 mb-3">
-                                <label class="form-label text-secondary fw-semibold small">Mes de las Facturas</label>
+                                <label class="form-label text-secondary fw-semibold small">Mes de las Boletas</label>
                                 <select name="mes" class="form-select" required style="border-radius: 8px; background:white; color:black;">
                                     @php
                                         $mesesFactura = [1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril', 5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto', 9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'];
@@ -919,9 +938,50 @@
                     </div>
                     <div class="modal-footer border-0 bg-light px-4 py-3" style="border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
                         <button type="button" class="btn btn-secondary fw-semibold" data-bs-dismiss="modal" style="border-radius: 8px;">Cancelar</button>
-                        <button type="submit" class="btn btn-primary fw-semibold" style="border-radius: 8px; background-color: var(--sidebar-active); border: none;">Generar Facturas</button>
+                        <button type="submit" class="btn btn-primary fw-semibold" style="border-radius: 8px; background-color: var(--sidebar-active); border: none;">Generar Boletas</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Multas -->
+    <div class="modal fade" id="modalMulta" tabindex="-1" aria-labelledby="modalMultaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header border-0 pt-4 px-4">
+                    <h5 class="modal-title fw-bold text-dark" id="modalMultaLabel">⚖️ Registrar Multa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body px-4 pb-4">
+                    <input type="hidden" name="usuario_id" id="multa_usuario_id">
+                    <p class="text-secondary small mb-3">Socio: <strong id="multa_socio_nombre" class="text-dark"></strong></p>
+                    
+                    <div class="mb-4">
+                        <label class="form-label text-secondary fw-semibold small">Seleccione los motivos (50 Bs c/u)</label>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input multa-check" type="checkbox" name="motivo[]" id="multaCorte" value="Multa por corte 50">
+                            <label class="form-check-label" for="multaCorte">
+                                Multa por corte 50
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input multa-check" type="checkbox" name="motivo[]" id="multaAsamblea" value="Falta asamblea">
+                            <label class="form-check-label" for="multaAsamblea">
+                                Falta asamblea
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary fw-semibold small">Fecha de la multa</label>
+                        <input type="date" id="fecha_multa_input" class="form-control" style="border-radius: 8px;" value="{{ date('Y-m-d') }}">
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light px-4 py-3" style="border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
+                    <button type="button" class="btn btn-secondary fw-semibold" data-bs-dismiss="modal" style="border-radius: 8px;">Cancelar</button>
+                    <button type="button" id="btnRegistrarMulta" class="btn btn-warning fw-semibold text-white" style="border-radius: 8px;">Aplicar Multas</button>
+                </div>
             </div>
         </div>
     </div>
@@ -945,6 +1005,55 @@
             const menuToggle = document.getElementById('menuToggle');
             const sidebar = document.querySelector('.sidebar');
             const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            // Lógica para pasar datos al modal de Multa
+            const modalMulta = document.getElementById('modalMulta');
+            if (modalMulta) {
+                modalMulta.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const usuarioId = button.getAttribute('data-usuario-id');
+                    const usuarioNombre = button.getAttribute('data-usuario-nombre');
+                    
+                    document.getElementById('multa_usuario_id').value = usuarioId;
+                    document.getElementById('multa_socio_nombre').textContent = usuarioNombre;
+                    // Limpiar selecciones previas
+                    modalMulta.querySelectorAll('.multa-check').forEach(cb => cb.checked = false);
+                });
+            }
+
+            // Lógica para sincronizar las multas con el formulario de la boleta
+            const btnRegistrarMulta = document.getElementById('btnRegistrarMulta');
+            if (btnRegistrarMulta) {
+                btnRegistrarMulta.addEventListener('click', function() {
+                    const userId = document.getElementById('multa_usuario_id').value;
+                    const form = document.getElementById('form-socio-' + userId);
+                    
+                    // Eliminar inputs de multas previos si existen en este formulario
+                    form.querySelectorAll('input[name="multas[]"]').forEach(i => i.remove());
+
+                    // Obtener checks seleccionados
+                    const checkboxes = document.querySelectorAll('#modalMulta .multa-check:checked');
+                    checkboxes.forEach(cb => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'multas[]';
+                        input.value = cb.value;
+                        form.appendChild(input);
+                    });
+
+                    // Actualizar visualmente el botón de multa del socio
+                    const btnSocio = document.querySelector(`button[data-usuario-id="${userId}"].btn-multa`);
+                    if (checkboxes.length > 0) {
+                        btnSocio.style.backgroundColor = '#b45309';
+                        btnSocio.innerHTML = `<i class="fa-solid fa-check"></i> Multa (${checkboxes.length})`;
+                    } else {
+                        btnSocio.style.backgroundColor = '#f59e0b';
+                        btnSocio.innerHTML = `<i class="fa-solid fa-scale-balanced me-1"></i> Multa`;
+                    }
+
+                    bootstrap.Modal.getInstance(modalMulta).hide();
+                });
+            }
 
             const toggleMenu = () => {
                 sidebar?.classList.toggle('active');

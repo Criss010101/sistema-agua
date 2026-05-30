@@ -178,8 +178,9 @@ class LecturaController extends Controller
                          ->withInput();
         }
 
+        $multasArr = $request->input('multas', []);
         $consumo_mes = max(0, $data['lectura_actual'] - $lectura_anterior);
-        $total_pagar = $this->calcularTotalPagar($consumo_mes);
+        $total_pagar = $this->calcularTotalPagar($consumo_mes) + (count($multasArr) * 50);
 
         Lectura::create([
             'usuario_id' => $data['usuario_id'],
@@ -188,6 +189,7 @@ class LecturaController extends Controller
             'lectura_actual' => $data['lectura_actual'],
             'consumo_mes' => $consumo_mes,
             'total_pagar' => $total_pagar,
+            'multas' => implode(', ', $multasArr),
             'mostrar_mensaje_corte' => $request->boolean('mostrar_mensaje_corte'),
         ]);
 
@@ -290,16 +292,23 @@ class LecturaController extends Controller
             'fecha_cobranza' => 'required|string',
         ]);
 
-        $lecturas = Lectura::whereHas('usuario', function ($query) use ($data) {
-            $query->where('comunidad_id', $data['comunidad_id']);
-        })
+        $lecturas = Lectura::with(['usuario.comunidad'])
+            ->whereHas('usuario', function ($query) use ($data) {
+                $query->where('comunidad_id', $data['comunidad_id']);
+            })
             ->where('mes', $data['mes'])
             ->where('anio', $data['anio'])
-            ->with(['usuario.comunidad'])
-            ->orderBy('usuario_id')
-            ->get();
+            ->join('usuarios', 'lecturas.usuario_id', '=', 'usuarios.id')
+            ->orderBy('usuarios.codigo_socio')
+            ->select('lecturas.*')
+            ->get()
+            ->map(function ($lectura) {
+                // Agregamos el valor de la lectura anterior para que esté disponible en cada factura del lote
+                $lectura->lectura_anterior_valor = $lectura->lectura_actual - $lectura->consumo_mes;
+                return $lectura;
+            });
 
-        $mensajeCorte = 'En corte por falta de cancelacion del servicio basico de agua ( 2 meses).';
+        $mensajeCorte = $request->get('mensaje_corte', 'En corte por falta de cancelacion del servicio basico de agua ( 2 meses).');
         // Usamos la primera lectura del lote para obtener los días del mes de forma consistente
         $diasConsumo = $lecturas->first() ? $lecturas->first()->dias_consumo : \Carbon\Carbon::createFromDate($data['anio'], $data['mes'], 1)->daysInMonth;
 
