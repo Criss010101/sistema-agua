@@ -189,7 +189,7 @@ class LecturaController extends Controller
             'lectura_actual' => $data['lectura_actual'],
             'consumo_mes' => $consumo_mes,
             'total_pagar' => $total_pagar,
-            'multas' => !empty($multasArr) ? implode(',', $multasArr) : null,
+            'multas' => count($multasArr) > 0 ? implode(',', $multasArr) : null,
             'mostrar_mensaje_corte' => $request->boolean('mostrar_mensaje_corte'),
         ]);
 
@@ -405,8 +405,8 @@ class LecturaController extends Controller
             ->where('mes', $data['mes'])
             ->where('anio', $data['anio'])
             ->join('usuarios', 'lecturas.usuario_id', '=', 'usuarios.id')
+            ->select('lecturas.*', 'usuarios.codigo_socio', 'usuarios.nombre')
             ->orderBy('usuarios.codigo_socio')
-            ->select('lecturas.*')
             ->get()
             ->map(function ($lectura) {
                 // Optimizamos: La lectura anterior es simplemente la actual menos el consumo registrado
