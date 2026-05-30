@@ -178,9 +178,9 @@ class LecturaController extends Controller
                          ->withInput();
         }
 
-        $multasArr = $request->input('multas', []);
+        $multasArr = array_filter($request->input('multas', []));
         $consumo_mes = max(0, $data['lectura_actual'] - $lectura_anterior);
-        $total_pagar = $this->calcularTotalPagar($consumo_mes) + (count($multasArr) * 50);
+        $total_pagar = $this->calcularTotalPagar($consumo_mes) + (count($multasArr) * 50.00);
 
         Lectura::create([
             'usuario_id' => $data['usuario_id'],
@@ -189,7 +189,7 @@ class LecturaController extends Controller
             'lectura_actual' => $data['lectura_actual'],
             'consumo_mes' => $consumo_mes,
             'total_pagar' => $total_pagar,
-            'multas' => implode(', ', $multasArr),
+            'multas' => !empty($multasArr) ? implode(',', $multasArr) : null,
             'mostrar_mensaje_corte' => $request->boolean('mostrar_mensaje_corte'),
         ]);
 
@@ -299,8 +299,8 @@ class LecturaController extends Controller
             ->where('mes', $data['mes'])
             ->where('anio', $data['anio'])
             ->join('usuarios', 'lecturas.usuario_id', '=', 'usuarios.id')
-            ->orderBy('usuarios.codigo_socio')
             ->select('lecturas.*')
+            ->orderBy('usuarios.codigo_socio')
             ->get()
             ->map(function ($lectura) {
                 // Agregamos el valor de la lectura anterior para que esté disponible en cada factura del lote

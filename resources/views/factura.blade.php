@@ -147,11 +147,13 @@
                         </td>
                     </tr>
                     @if(!empty($lectura->multas))
-                        @foreach(explode(', ', $lectura->multas) as $multa)
-                            <tr class="bg-yellow-200">
-                                <td class="border border-black p-1">{{ $multa }}</td>
-                                <td class="border border-black p-1 text-right font-bold">50.00 Bs</td>
-                            </tr>
+                        @foreach(explode(',', $lectura->multas) as $m)
+                            @if(trim($m) != '')
+                                <tr class="bg-yellow-200" style="-webkit-print-color-adjust: exact;">
+                                    <td class="border border-black p-1 uppercase font-bold">{{ trim($m) }}</td>
+                                    <td class="border border-black p-1 text-right font-bold">50.00 Bs</td>
+                                </tr>
+                            @endif
                         @endforeach
                     @endif
                 </table>
