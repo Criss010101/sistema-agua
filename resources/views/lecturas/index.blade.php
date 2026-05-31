@@ -817,6 +817,7 @@
                                 <input type="hidden" name="mes" value="{{ $mesActual }}">
                                 <input type="hidden" name="anio" value="{{ $anioActual }}">
                                 <input type="number" name="lectura_actual" class="input-m3" placeholder="M³ Actuales" required min="0" inputmode="numeric">
+                                <input type="number" name="meses_deuda_manual" class="input-m3" placeholder="Meses Deuda" min="0" style="width: 100px;" value="{{ $yaRegistrado ? $usuario->ultimaLectura->meses_deuda_manual : '' }}">
                                 <button type="submit" class="btn-boleta {{ $yaRegistrado ? 'bg-secondary' : '' }}">
                                     <i class="fa-solid {{ $yaRegistrado ? 'fa-circle-check' : 'fa-file-invoice-dollar' }} me-1"></i> 
                                     {{ $yaRegistrado ? 'Re-generar' : 'Generar Boleta' }}

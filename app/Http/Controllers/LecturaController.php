@@ -172,6 +172,7 @@ class LecturaController extends Controller
             'multas' => 'nullable|array',
             'mes' => 'nullable|integer|min:1|max:12',
             'anio' => 'nullable|integer',
+            'meses_deuda_manual' => 'nullable|integer|min:0',
         ]);
         $usuario = Usuario::findOrFail($data['usuario_id']);
 
@@ -193,16 +194,22 @@ class LecturaController extends Controller
             $total_pagar += (count($multasSeleccionadas) * 50.00);
         }
 
-        Lectura::create([
-            'usuario_id' => $data['usuario_id'],
-            'mes' => $request->input('mes', now()->month),
-            'anio' => $request->input('anio', now()->year),
-            'lectura_actual' => $data['lectura_actual'],
-            'consumo_mes' => $consumo_mes,
-            'total_pagar' => $total_pagar,
-            'multas' => !empty($multasSeleccionadas) ? implode(', ', $multasSeleccionadas) : null,
-            'mostrar_mensaje_corte' => $request->boolean('mostrar_mensaje_corte'),
-        ]);
+        // Usamos updateOrCreate para evitar duplicados si ya existe lectura en este mes/año
+        Lectura::updateOrCreate(
+            [
+                'usuario_id' => $data['usuario_id'],
+                'mes' => $request->input('mes', now()->month),
+                'anio' => $request->input('anio', now()->year),
+            ],
+            [
+                'lectura_actual' => $data['lectura_actual'],
+                'consumo_mes' => $consumo_mes,
+                'total_pagar' => $total_pagar,
+                'multas' => !empty($multasSeleccionadas) ? implode(', ', $multasSeleccionadas) : null,
+                'mostrar_mensaje_corte' => $request->boolean('mostrar_mensaje_corte'),
+                'meses_deuda_manual' => $data['meses_deuda_manual'],
+            ]
+        );
 
         return back()->with('success', 'Lectura registrada correctamente.');
     }
@@ -303,7 +310,8 @@ class LecturaController extends Controller
             'fecha_cobranza' => 'required|string',
         ]);
 
-        $lecturas = Lectura::with(['usuario.comunidad'])
+        $lecturas = Lectura::select('lecturas.*')
+            ->with(['usuario.comunidad'])
             ->whereHas('usuario', function ($query) use ($data) {
                 $query->where('comunidad_id', $data['comunidad_id']);
             })
@@ -311,7 +319,6 @@ class LecturaController extends Controller
             ->where('anio', $data['anio'])
             ->join('usuarios', 'lecturas.usuario_id', '=', 'usuarios.id')
             ->orderBy('usuarios.codigo_socio', 'asc')
-            ->select('lecturas.*')
             ->get();
 
         $mensajeCorte = $request->get('mensaje_corte', 'En corte por falta de cancelacion del servicio basico de agua ( 2 meses).');

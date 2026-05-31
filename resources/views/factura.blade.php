@@ -202,7 +202,8 @@
         </div>
 
         @php
-            $mesesDeuda = $historico->where('estado', '!=', 'pagado')->count();
+            $mesesDeudaCalculados = $historico->where('estado', '!=', 'pagado')->count();
+            $mesesDeuda = ($lectura->meses_deuda_manual !== null) ? (int)$lectura->meses_deuda_manual : $mesesDeudaCalculados;
         @endphp
         <div class="{{ $mesesDeuda >= 2 ? 'bg-yellow-300' : 'bg-green-50' }} border-2 border-black p-2 text-center font-sans font-bold text-[11px] leading-tight text-black">
             @if($mesesDeuda >= 2)

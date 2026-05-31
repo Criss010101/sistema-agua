@@ -80,9 +80,11 @@
             $historico = \App\Models\Lectura::where('usuario_id', $lectura->usuario_id)
                 ->where('id', '!=', $lectura->id)
                 ->orderByDesc('created_at')
-                ->limit(12)
+                ->limit(7)
                 ->get();
-            $mesesDeuda = $historico->where('estado', '!=', 'pagado')->count();
+
+            $mesesDeudaCalculados = $historico->where('estado', '!=', 'pagado')->count();
+            $mesesDeuda = ($lectura->meses_deuda_manual !== null) ? (int)$lectura->meses_deuda_manual : $mesesDeudaCalculados;
 
             $meses = [1=>'ENERO', 2=>'FEBRERO', 3=>'MARZO', 4=>'ABRIL', 5=>'MAYO', 6=>'JUNIO', 7=>'JULIO', 8=>'AGOSTO', 9=>'SEPTIEMBRE', 10=>'OCTUBRE', 11=>'NOVIEMBRE', 12=>'DICIEMBRE'];
         @endphp

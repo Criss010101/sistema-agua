@@ -9,7 +9,7 @@ class Lectura extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['usuario_id', 'mes', 'anio', 'lectura_actual', 'consumo_mes', 'total_pagar', 'multas', 'estado', 'mostrar_mensaje_corte'];
+    protected $fillable = ['usuario_id', 'mes', 'anio', 'lectura_actual', 'consumo_mes', 'total_pagar', 'multas', 'estado', 'mostrar_mensaje_corte', 'meses_deuda_manual'];
 
     protected $casts = [
         'mostrar_mensaje_corte' => 'boolean',
