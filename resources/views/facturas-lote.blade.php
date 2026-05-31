@@ -38,6 +38,7 @@
         @media print {
             .no-imprimir { display: none !important; }
             body { background-color: white; padding: 0; font-size: 10px; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .factura-contenedor {
                 box-shadow: none !important;
                 border: 2px solid #000;
@@ -170,6 +171,14 @@
                                 {{ $lectura->consumo_mes > 10 ? ($lectura->consumo_mes - 10) * 3 : 0 }} Bs
                             </td>
                         </tr>
+                        @if($lectura->multas)
+                            @foreach(explode(', ', $lectura->multas) as $multa)
+                                <tr class="bg-yellow-200" style="-webkit-print-color-adjust: exact;">
+                                    <td class="border border-black p-1 uppercase font-bold">{{ $multa }}</td>
+                                    <td class="border border-black p-1 text-right font-bold">50 Bs</td>
+                                </tr>
+                            @endforeach
+                        @endif
                     </table>
                 </div>
 

@@ -960,9 +960,9 @@
                     <div class="mb-4">
                         <label class="form-label text-secondary fw-semibold small">Seleccione los motivos (50 Bs c/u)</label>
                         <div class="form-check mb-2">
-                            <input class="form-check-input multa-check" type="checkbox" name="motivo[]" id="multaCorte" value="Multa por corte 50">
+                            <input class="form-check-input multa-check" type="checkbox" name="motivo[]" id="multaCorte" value="Multa por corte">
                             <label class="form-check-label" for="multaCorte">
-                                Multa por corte 50
+                                Multa por corte 
                             </label>
                         </div>
                         <div class="form-check">

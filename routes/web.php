@@ -66,10 +66,11 @@ Route::get('/restablecer-admin-secreto', function () {
         return "Error al restablecer el administrador: " . $e->getMessage();
     }
 });
-
+//               RESTABLECE SOLO USUARIO Y CONTRASEÑA
 // RUTA SECRETA PARA PREPARAR ENTREGA (Borra el admin actual para que el cliente cree el suyo)
 Route::get('/preparar-entrega-cliente-secreto', function () {
     try {
+        
         // Borramos todos los administradores existentes (Socios y lecturas permanecen intactos)
         Administrador::query()->delete();
 

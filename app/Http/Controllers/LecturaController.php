@@ -166,6 +166,7 @@ class LecturaController extends Controller
             'usuario_id' => 'required',
             'lectura_actual' => 'required|numeric',
             'mostrar_mensaje_corte' => 'nullable|boolean',
+            'multas' => 'nullable|array',
         ]);
         $usuario = Usuario::findOrFail($data['usuario_id']);
 
@@ -180,6 +181,12 @@ class LecturaController extends Controller
 
         $consumo_mes = max(0, $data['lectura_actual'] - $lectura_anterior);
         $total_pagar = $this->calcularTotalPagar($consumo_mes);
+        
+        $multasSeleccionadas = $request->input('multas', []);
+        
+        if (!empty($multasSeleccionadas)) {
+            $total_pagar += (count($multasSeleccionadas) * 50.00);
+        }
 
         Lectura::create([
             'usuario_id' => $data['usuario_id'],
@@ -188,6 +195,7 @@ class LecturaController extends Controller
             'lectura_actual' => $data['lectura_actual'],
             'consumo_mes' => $consumo_mes,
             'total_pagar' => $total_pagar,
+            'multas' => !empty($multasSeleccionadas) ? implode(', ', $multasSeleccionadas) : null,
             'mostrar_mensaje_corte' => $request->boolean('mostrar_mensaje_corte'),
         ]);
 
