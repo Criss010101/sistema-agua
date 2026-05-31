@@ -756,12 +756,27 @@
 
             <div class="search-wrapper">
                 <form action="{{ route('lecturas.index') }}" method="GET" class="search-form">
-                    <div style="width: 240px; margin-right:12px">
+                    <div class="d-flex gap-2">
                         <select name="comunidad_id" class="form-select" style="border-radius: 12px; padding: 10px; background:white; color:black;">
                             <option value="">Todas las comunidades</option>
                             @foreach($comunidades as $c)
                                 <option value="{{ $c->id }}" {{ (string)$comunidadSeleccionada === (string)$c->id ? 'selected' : '' }}>{{ $c->nombre }}</option>
                             @endforeach
+                        </select>
+
+                        <select name="mes" class="form-select" style="border-radius: 12px; width: 130px;">
+                            @php
+                                $mesesNombres = [1=>'Enero', 2=>'Febrero', 3=>'Marzo', 4=>'Abril', 5=>'Mayo', 6=>'Junio', 7=>'Julio', 8=>'Agosto', 9=>'Septiembre', 10=>'Octubre', 11=>'Noviembre', 12=>'Diciembre'];
+                            @endphp
+                            @foreach($mesesNombres as $mNum => $mNom)
+                                <option value="{{ $mNum }}" {{ $mesActual == $mNum ? 'selected' : '' }}>{{ $mNom }}</option>
+                            @endforeach
+                        </select>
+
+                        <select name="anio" class="form-select" style="border-radius: 12px; width: 100px;">
+                            @for($i = now()->year; $i >= 2024; $i--)
+                                <option value="{{ $i }}" {{ $anioActual == $i ? 'selected' : '' }}>{{ $i }}</option>
+                            @endfor
                         </select>
                     </div>
                     <div class="search-container flex-grow-1">
@@ -793,16 +808,18 @@
                         <div class="socio-actions">
                             @php
                                 $yaRegistrado = $usuario->ultimaLectura && 
-                                               $usuario->ultimaLectura->mes == now()->month && 
-                                               $usuario->ultimaLectura->anio == now()->year;
+                                               $usuario->ultimaLectura->mes == $mesActual && 
+                                               $usuario->ultimaLectura->anio == $anioActual;
                             @endphp
                             <form action="{{ route('lecturas.store') }}" method="POST" class="socio-form" id="form-socio-{{ $usuario->id }}">
                                 @csrf
                                 <input type="hidden" name="usuario_id" value="{{ $usuario->id }}">
-                                <input type="number" name="lectura_actual" class="input-m3" placeholder="M³ Actuales" required min="0" inputmode="numeric" {{ $yaRegistrado ? 'disabled' : '' }}>
-                                <button type="submit" class="btn-boleta {{ $yaRegistrado ? 'registrado' : '' }}" {{ $yaRegistrado ? 'disabled' : '' }}>
+                                <input type="hidden" name="mes" value="{{ $mesActual }}">
+                                <input type="hidden" name="anio" value="{{ $anioActual }}">
+                                <input type="number" name="lectura_actual" class="input-m3" placeholder="M³ Actuales" required min="0" inputmode="numeric">
+                                <button type="submit" class="btn-boleta {{ $yaRegistrado ? 'bg-secondary' : '' }}">
                                     <i class="fa-solid {{ $yaRegistrado ? 'fa-circle-check' : 'fa-file-invoice-dollar' }} me-1"></i> 
-                                    {{ $yaRegistrado ? 'Registrado' : 'Generar Boleta' }}
+                                    {{ $yaRegistrado ? 'Re-generar' : 'Generar Boleta' }}
                                 </button>
                             </form>
 

@@ -130,6 +130,9 @@ class LecturaController extends Controller
     public function index(Request $request) {
         $comunidadSeleccionada = $request->get('comunidad_id');
         $search = trim((string) $request->get('q'));
+        $mesActual = (int) $request->get('mes', now()->month);
+        $anioActual = (int) $request->get('anio', now()->year);
+
         $comunidades = Comunidad::all();
         $siguienteCodigoPorComunidad = Usuario::select('comunidad_id')
             ->selectRaw('MAX(codigo_socio) + 1 as siguiente_codigo')
@@ -157,7 +160,7 @@ class LecturaController extends Controller
             })
             ->paginate(15);
 
-        return view('lecturas.index', compact('usuarios', 'comunidades', 'comunidadSeleccionada', 'siguienteCodigoPorComunidad', 'search'));
+        return view('lecturas.index', compact('usuarios', 'comunidades', 'comunidadSeleccionada', 'siguienteCodigoPorComunidad', 'search', 'mesActual', 'anioActual'));
     }
 
     // Guarda una nueva lectura
@@ -167,6 +170,8 @@ class LecturaController extends Controller
             'lectura_actual' => 'required|numeric',
             'mostrar_mensaje_corte' => 'nullable|boolean',
             'multas' => 'nullable|array',
+            'mes' => 'nullable|integer|min:1|max:12',
+            'anio' => 'nullable|integer',
         ]);
         $usuario = Usuario::findOrFail($data['usuario_id']);
 
@@ -190,8 +195,8 @@ class LecturaController extends Controller
 
         Lectura::create([
             'usuario_id' => $data['usuario_id'],
-            'mes' => now()->month,
-            'anio' => now()->year,
+            'mes' => $request->input('mes', now()->month),
+            'anio' => $request->input('anio', now()->year),
             'lectura_actual' => $data['lectura_actual'],
             'consumo_mes' => $consumo_mes,
             'total_pagar' => $total_pagar,
@@ -298,12 +303,15 @@ class LecturaController extends Controller
             'fecha_cobranza' => 'required|string',
         ]);
 
-        $lecturas = Lectura::whereHas('usuario', function ($query) use ($data) {
-            $query->where('comunidad_id', $data['comunidad_id']);
-        })
+        $lecturas = Lectura::with(['usuario.comunidad'])
+            ->whereHas('usuario', function ($query) use ($data) {
+                $query->where('comunidad_id', $data['comunidad_id']);
+            })
             ->where('mes', $data['mes'])
             ->where('anio', $data['anio'])
-            ->with(['usuario.comunidad'])
+            ->join('usuarios', 'lecturas.usuario_id', '=', 'usuarios.id')
+            ->orderBy('usuarios.codigo_socio', 'asc')
+            ->select('lecturas.*')
             ->get();
 
         $mensajeCorte = $request->get('mensaje_corte', 'En corte por falta de cancelacion del servicio basico de agua ( 2 meses).');
@@ -396,12 +404,15 @@ class LecturaController extends Controller
         ]);
 
         $comunidad = Comunidad::findOrFail($data['comunidad_id']);
-        $lecturas = Lectura::whereHas('usuario', function ($query) use ($data) {
-            $query->where('comunidad_id', $data['comunidad_id']);
-        })
+        $lecturas = Lectura::with(['usuario.comunidad'])
+            ->whereHas('usuario', function ($query) use ($data) {
+                $query->where('comunidad_id', $data['comunidad_id']);
+            })
             ->where('mes', $data['mes'])
             ->where('anio', $data['anio'])
-            ->with(['usuario.comunidad'])
+            ->join('usuarios', 'lecturas.usuario_id', '=', 'usuarios.id')
+            ->orderBy('usuarios.codigo_socio', 'asc')
+            ->select('lecturas.*')
             ->get();
 
         return view('reportes.comunidad', [
