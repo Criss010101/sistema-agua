@@ -18,11 +18,13 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             min-height: 100vh;
+            min-height: 100dvh;
             margin: 0;
             padding: 0;
             background: linear-gradient(135deg, #071e3d 0%, #1e3a8a 100%);
             display: flex;
             flex-direction: column;
+            justify-content: center;
             overflow-x: hidden;
             position: relative;
         }
@@ -30,7 +32,7 @@
         /* --- FONDO ANIMADO DE OLAS --- */
         .ocean { 
             height: 100%; width: 100%;
-            position: absolute; bottom: 0; left: 0;
+            position: fixed; bottom: 0; left: 0;
             background: transparent; z-index: 1; pointer-events: none;
         }
 
@@ -63,6 +65,9 @@
             position: relative;
             z-index: 2; /* Por encima de las olas */
             width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         /* --- GLASSMORPHISM CARD --- */
@@ -73,7 +78,7 @@
             border-radius: 32px; 
             border: 1px solid rgba(255, 255, 255, 0.4); 
             max-width: 550px; 
-            margin: 60px auto; 
+            margin: auto; 
             padding: 50px 40px; 
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             transition: transform 0.3s ease;
@@ -147,6 +152,29 @@
             background: white;
             color: var(--dark-navy);
         }
+        @media (max-width: 576px) {
+            .hero-card {
+                margin: 10px;
+                padding: 35px 20px;
+                border-radius: 24px;
+            }
+            .droplet-icon {
+                font-size: 2.8rem;
+                margin-bottom: 15px;
+            }
+            h2 { font-size: 1.5rem; }
+            .top-nav-mobile {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px !important;
+            }
+            .top-nav-mobile .d-flex {
+                justify-content: center;
+            }
+            .btn-login-top {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -159,7 +187,7 @@
 
     <div class="main-content container">
         <!-- Topbar mejorada -->
-        <div class="d-flex justify-content-between align-items-center py-4">
+        <div class="d-flex justify-content-between align-items-center py-4 top-nav-mobile">
             <div class="d-flex align-items-center gap-3">
                 <div class="bg-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 45px; height: 45px;">
                     <span style="font-size: 1.2rem; color: #2563eb;"><i class="fa-solid fa-droplet"></i></span>
