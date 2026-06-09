@@ -18,15 +18,55 @@
             min-height: 100dvh;
             margin: 0;
             padding: 16px;
+            position: relative;
+            overflow: hidden;
         }
+
+        /* FONDO EN MOVIMIENTO - AGUA (Capa trasera) */
+        .water-bg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none; /* EVITA QUE BLOQUEE LOS CLICS */
+            overflow: hidden;
+        }
+        .wave {
+            position: absolute;
+            bottom: -50px;
+            left: 0;
+            width: 200%;
+            height: 260px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,42.4V120H0Z" style="fill:%230ea5e9;opacity:0.12;"></path></svg>') repeat-x;
+            animation: waveMotion 12s linear infinite;
+        }
+        .wave:nth-of-type(2) {
+            bottom: -30px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,42.4V120H0Z" style="fill:%2338bdf8;opacity:0.18;"></path></svg>') repeat-x;
+            animation: waveBackwards 8s linear infinite;
+        }
+        @keyframes waveMotion {
+            0% { background-position-x: 0; }
+            100% { background-position-x: 1200px; }
+        }
+        @keyframes waveBackwards {
+            0% { background-position-x: 0; }
+            100% { background-position-x: -1200px; }
+        }
+
+        /* LA TARJETA (Capa delantera estructurada) */
         .login-card {
             background: #1e293b;
             border-radius: 20px;
             width: 100%;
             max-width: 400px;
             padding: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
             border: 1px solid #334155;
+            position: relative;
+            z-index: 2; /* COLOCA LA TARJETA POR ENCIMA DEL AGUA */
         }
         .form-control {
             background: #0f172a;
@@ -36,38 +76,38 @@
             padding: 12px;
             min-height: 46px;
         }
-        .form-control:focus { background: #0f172a; color: white; border-color: #6366f1; box-shadow: none; }
+        .form-control:focus { background: #0f172a; color: white; border-color: #38bdf8; box-shadow: none; }
         .btn-indigo {
-            background-color: #6366f1;
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
             color: white;
             border-radius: 10px;
             font-weight: 600;
             border: none;
             min-height: 46px;
+            transition: opacity 0.2s;
         }
+        .btn-indigo:hover { opacity: 0.9; color: white; }
         @media (max-width: 575.98px) {
-            body {
-                padding: 12px;
-                align-items: stretch;
-            }
-
+            body { padding: 12px; align-items: stretch; }
+            .login-card { max-width: 100%; padding: 24px 18px; border-radius: 18px; }
+            h4 { font-size: 1.25rem; }
+            .form-control { font-size: 16px; }
+        }
+        @media (max-width: 400px) {
             .login-card {
-                max-width: 100%;
-                padding: 24px 18px;
-                border-radius: 18px;
+                padding: 25px 15px;
             }
-
-            h4 {
-                font-size: 1.25rem;
-            }
-
-            .form-control {
-                font-size: 16px;
-            }
+            .wave { height: 160px; }
         }
     </style>
 </head>
 <body>
+
+    <div class="water-bg">
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+
     <div class="login-card">
         <h4 class="fw-bold text-white text-center mb-1">Panel de Control</h4>
         <p class="text-center small mb-4" style="color: #94a3b8;">Acceso autorizado exclusivo para operadores</p>

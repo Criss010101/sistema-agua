@@ -9,10 +9,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-main: #f4f6fa;
+            --bg-main: #f8fafc;
             --sidebar-bg: #0f172a;
             --sidebar-active: #6366f1;
+            --sidebar-hover: #1e293b;
             --text-muted: #64748b;
+            --border-color: #e2e8f0;
         }
         body {
             margin: 0;
@@ -29,9 +31,11 @@
             color: #94a3b8;
             padding: 24px 16px;
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
         }
         .sidebar-brand {
-            padding: 10px 14px;
+            padding: 14px;
             margin-bottom: 30px;
             border: 1px solid #1e293b;
             border-radius: 12px;
@@ -44,8 +48,9 @@
             margin: 0;
         }
         .sidebar-brand span {
-            color: #6366f1;
+            color: #818cf8;
             font-size: 0.75rem;
+            font-weight: 500;
         }
         .menu-section-title {
             font-size: 0.7rem;
@@ -71,8 +76,12 @@
             font-size: 0.9rem;
             font-weight: 600;
             border-radius: 10px;
+            transition: all 0.2s ease;
         }
-        .nav-item-link:hover,
+        .nav-item-link:hover {
+            background: var(--sidebar-hover);
+            color: #f1f5f9;
+        }
         .nav-item-link.active {
             background: var(--sidebar-active);
             color: #fff;
@@ -81,64 +90,76 @@
             flex: 1;
             height: 100vh;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
         .topbar {
             background: #fff;
-            padding: 16px 40px;
-            border-bottom: 1px solid #e2e8f0;
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 16px;
+            flex-shrink: 0;
         }
         .content-body {
-            padding: 28px 40px 40px;
-            max-width: 1200px;
+            padding: 32px 40px 40px;
+            max-width: 1400px;
+            width: 100%;
             margin: 0 auto;
         }
         .stat-grid {
             display: grid;
-            grid-template-columns: repeat(5, minmax(0, 1fr));
-            gap: 14px;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
         }
         .stat-card,
         .panel {
             background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03), 0 10px 15px -3px rgba(15, 23, 42, 0.05);
         }
         .stat-card {
-            padding: 18px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
         }
         .stat-icon {
-            width: 38px;
-            height: 38px;
+            width: 42px;
+            height: 42px;
             border-radius: 10px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             color: #fff;
+            font-size: 1.1rem;
         }
         .stat-label {
             color: var(--text-muted);
-            font-size: 0.78rem;
-            font-weight: 800;
+            font-size: 0.75rem;
+            font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .stat-value {
-            font-size: 1.65rem;
+            font-size: 1.75rem;
             font-weight: 800;
-            margin: 2px 0 0;
+            margin: 4px 0 0;
+            color: #0f172a;
         }
         .panel {
-            padding: 18px;
+            padding: 24px;
+            height: 100%;
         }
         .panel-title {
             font-size: 1rem;
-            font-weight: 800;
-            margin-bottom: 14px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 20px;
         }
         .table {
             margin-bottom: 0;
@@ -146,45 +167,75 @@
         }
         .table th {
             color: var(--text-muted);
-            font-size: 0.74rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            padding: 12px 16px;
+            border-bottom-width: 2px;
+        }
+        .table td {
+            padding: 14px 16px;
+            color: #334155;
         }
         .status-pill {
-            padding: 4px 9px;
+            padding: 6px 12px;
             border-radius: 999px;
             font-size: 0.72rem;
-            font-weight: 800;
+            font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
         }
         .status-paid {
-            background: #dcfce7;
-            color: #15803d;
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
         }
         .status-pending {
-            background: #fee2e2;
-            color: #b91c1c;
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
         }
         .quick-actions {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: 12px;
         }
         .quick-actions a,
         .quick-actions button {
             border-radius: 10px;
-            font-weight: 800;
+            font-weight: 700;
             padding: 12px;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        .quick-actions a:hover,
+        .quick-actions button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        @media (max-width: 1200px) {
+            .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .quick-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
         }
         @media (max-width: 1000px) {
             body { overflow: auto; height: auto; }
             .sidebar { display: none; }
             .main-content { height: auto; }
-            .stat-grid,
+            .topbar { padding: 20px; }
+            .content-body { padding: 20px; }
+        }
+        @media (max-width: 768px) {
+            .topbar { flex-direction: column; align-items: start; }
+            .topbar form { width: 100%; }
             .quick-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
-        @media (max-width: 650px) {
-            .topbar,
-            .content-body { padding-left: 18px; padding-right: 18px; }
+        @media (max-width: 480px) {
             .stat-grid,
             .quick-actions { grid-template-columns: 1fr; }
         }
@@ -213,18 +264,18 @@
     <main class="main-content">
         <div class="topbar">
             <div>
-                <h2 class="fw-bold mb-1">Dashboard</h2>
-                <p class="text-secondary mb-0">Resumen general de socios, boletas, pagos y consumo.</p>
+                <h2 class="fw-bold mb-1" style="color: #0f172a; font-size: 1.5rem;">Dashboard</h2>
+                <p class="text-secondary mb-0" style="font-size: 0.9rem;">Resumen general de socios, boletas, pagos y consumo.</p>
             </div>
 
             <form action="{{ route('dashboard') }}" method="GET" class="d-flex gap-2 align-items-center">
-                <select name="mes" class="form-select form-select-sm fw-semibold">
+                <select name="mes" class="form-select form-select-sm fw-semibold" style="border-color: var(--border-color);">
                     @foreach($meses as $numeroMes => $nombreMes)
                         <option value="{{ $numeroMes }}" {{ $mesSeleccionado === $numeroMes ? 'selected' : '' }}>{{ $nombreMes }}</option>
                     @endforeach
                 </select>
-                <input type="number" name="anio" class="form-control form-control-sm fw-semibold" min="2000" max="2100" value="{{ $anioSeleccionado }}" style="width: 96px;">
-                <button class="btn btn-dark btn-sm fw-bold" type="submit">Ver</button>
+                <input type="number" name="anio" class="form-control form-control-sm fw-semibold" min="2000" max="2100" value="{{ $anioSeleccionado }}" style="width: 96px; border-color: var(--border-color);">
+                <button class="btn btn-dark btn-sm fw-bold px-3" type="submit">Ver</button>
                 <a href="{{ route('password.change') }}" class="btn btn-outline-secondary btn-sm fw-bold">
                     <i class="fa-solid fa-key"></i>
                 </a>
@@ -233,12 +284,12 @@
 
         <div class="content-body">
             <div class="quick-actions mb-4">
-                <a href="{{ route('lecturas.index') }}" class="btn btn-primary"><i class="fa-solid fa-droplet me-1"></i> Registrar Lectura</a>
-                <a href="{{ route('lecturas.index') }}#modalFacturasLote" class="btn btn-success"><i class="fa-solid fa-print me-1"></i> Generar Facturas</a>
-                <a href="{{ route('pagos.index', ['mes' => $mesSeleccionado, 'anio' => $anioSeleccionado]) }}" class="btn btn-warning"><i class="fa-solid fa-check-to-slot me-1"></i> Registrar Pagos</a>
-                <a href="{{ route('lecturas.index') }}#modalUsuario" class="btn btn-outline-dark"><i class="fa-solid fa-user-plus me-1"></i> Nuevo Socio</a>
+                <a href="{{ route('lecturas.index') }}" class="btn btn-primary"><i class="fa-solid fa-droplet"></i> Registrar Lectura</a>
+                <a href="{{ route('lecturas.index') }}#modalFacturasLote" class="btn btn-success"><i class="fa-solid fa-print"></i> Generar Facturas</a>
+                <a href="{{ route('pagos.index', ['mes' => $mesSeleccionado, 'anio' => $anioSeleccionado]) }}" class="btn btn-warning text-dark"><i class="fa-solid fa-check-to-slot"></i> Registrar Pagos</a>
+                <a href="{{ route('lecturas.index') }}#modalUsuario" class="btn btn-outline-dark"><i class="fa-solid fa-user-plus"></i> Nuevo Socio</a>
                 <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalReporteComunidad">
-                    <i class="fa-solid fa-table me-1"></i> Lista Comunidad
+                    <i class="fa-solid fa-table"></i> Lista Comunidad
                 </button>
             </div>
 
@@ -257,28 +308,28 @@
                     <div class="stat-icon" style="background:#16a34a;"><i class="fa-solid fa-sack-dollar"></i></div>
                     <div class="stat-label">Pagado</div>
                     <div class="stat-value">Bs. {{ number_format($stats['total_recaudado'], 2) }}</div>
-                    <div class="text-secondary small">{{ $stats['pagadas'] }} factura(s)</div>
+                    <div class="text-secondary small mt-1"><i class="fa-solid fa-circle-check text-success me-1"></i>{{ $stats['pagadas'] }} factura(s)</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon" style="background:#dc2626;"><i class="fa-solid fa-triangle-exclamation"></i></div>
                     <div class="stat-label">Pendiente</div>
                     <div class="stat-value">Bs. {{ number_format($stats['total_pendiente'], 2) }}</div>
-                    <div class="text-secondary small">{{ $stats['pendientes'] }} factura(s)</div>
+                    <div class="text-secondary small mt-1"><i class="fa-solid fa-clock text-danger me-1"></i>{{ $stats['pendientes'] }} factura(s)</div>
                 </div>
             </div>
 
             <div class="stat-grid mb-4">
                 <div class="stat-card">
                     <div class="stat-label">Comunidades</div>
-                    <div class="stat-value">{{ $stats['total_comunidades'] }}</div>
+                    <div class="stat-value" style="font-size: 1.4rem;">{{ $stats['total_comunidades'] }}</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Consumo total</div>
-                    <div class="stat-value">{{ $stats['consumo_mes'] }} m³</div>
+                    <div class="stat-value" style="font-size: 1.4rem;">{{ $stats['consumo_mes'] }} m³</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Periodo</div>
-                    <div class="stat-value">{{ $meses[$mesSeleccionado] ?? '' }}</div>
+                    <div class="stat-value" style="font-size: 1.4rem;">{{ $meses[$mesSeleccionado] ?? '' }}</div>
                     <div class="text-secondary small">{{ $anioSeleccionado }}</div>
                 </div>
                 <div class="stat-card">
@@ -286,7 +337,10 @@
                     @php
                         $avance = $stats['boletas_mes'] > 0 ? round(($stats['pagadas'] / $stats['boletas_mes']) * 100) : 0;
                     @endphp
-                    <div class="stat-value">{{ $avance }}%</div>
+                    <div class="stat-value" style="font-size: 1.4rem;">{{ $avance }}%</div>
+                    <div class="progress mt-2" style="height: 6px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ $avance }}%" aria-valuenow="{{ $avance }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
                 </div>
             </div>
 
@@ -295,7 +349,7 @@
                     <div class="panel">
                         <div class="panel-title">Socios y pagos por comunidad</div>
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table table-hover align-middle">
                                 <thead>
                                     <tr>
                                         <th>Comunidad</th>
@@ -309,12 +363,12 @@
                                 <tbody>
                                     @foreach($resumenComunidades as $comunidad)
                                         <tr>
-                                            <td class="fw-bold">{{ $comunidad['nombre'] }}</td>
+                                            <td class="fw-bold text-dark">{{ $comunidad['nombre'] }}</td>
                                             <td>{{ $comunidad['socios'] }}</td>
                                             <td>{{ $comunidad['boletas'] }}</td>
                                             <td class="text-success fw-bold">{{ $comunidad['pagadas'] }}</td>
                                             <td class="text-danger fw-bold">{{ $comunidad['pendientes'] }}</td>
-                                            <td>Bs. {{ number_format($comunidad['deuda'], 2) }}</td>
+                                            <td class="fw-semibold">Bs. {{ number_format($comunidad['deuda'], 2) }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -326,17 +380,22 @@
                 <div class="col-lg-5">
                     <div class="panel">
                         <div class="panel-title">Pagos pendientes</div>
-                        @forelse($pendientesDetalle as $lectura)
-                            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                                <div>
-                                    <div class="fw-bold">{{ $lectura->usuario->nombre }}</div>
-                                    <div class="text-secondary small">{{ $lectura->usuario->comunidad->nombre }} · Socio #{{ $lectura->usuario->codigo_socio }}</div>
+                        <div style="max-height: 340px; overflow-y: auto; padding-right: 4px;">
+                            @forelse($pendientesDetalle as $lectura)
+                                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                                    <div>
+                                        <div class="fw-bold style-dark" style="font-size: 0.9rem;">{{ $lectura->usuario->nombre }}</div>
+                                        <div class="text-secondary small">{{ $lectura->usuario->comunidad->nombre }} · Socio #{{ $lectura->usuario->codigo_socio }}</div>
+                                    </div>
+                                    <strong class="text-danger" style="font-size: 0.95rem;">Bs. {{ number_format($lectura->total_pagar, 2) }}</strong>
                                 </div>
-                                <strong>Bs. {{ number_format($lectura->total_pagar, 2) }}</strong>
-                            </div>
-                        @empty
-                            <p class="text-secondary mb-0">No hay pagos pendientes en este periodo.</p>
-                        @endforelse
+                            @empty
+                                <div class="text-center py-4">
+                                    <i class="fa-solid fa-circle-check text-success fs-3 mb-2"></i>
+                                    <p class="text-secondary mb-0 small">No hay pagos pendientes en este periodo.</p>
+                                </div>
+                            @endforelse
+                        </div>
                     </div>
                 </div>
 
@@ -344,7 +403,7 @@
                     <div class="panel">
                         <div class="panel-title">Últimas boletas generadas</div>
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table table-hover align-middle">
                                 <thead>
                                     <tr>
                                         <th>Fecha</th>
@@ -359,10 +418,10 @@
                                     @forelse($ultimasBoletas as $lectura)
                                         <tr>
                                             <td>{{ $lectura->created_at->format('d/m/Y') }}</td>
-                                            <td class="fw-bold">{{ $lectura->usuario->nombre }}</td>
+                                            <td class="fw-bold text-dark">{{ $lectura->usuario->nombre }}</td>
                                             <td>{{ $lectura->usuario->comunidad->nombre }}</td>
-                                            <td>{{ $lectura->consumo_mes }} m³</td>
-                                            <td>Bs. {{ number_format($lectura->total_pagar, 2) }}</td>
+                                            <td class="fw-semibold">{{ $lectura->consumo_mes }} m³</td>
+                                            <td class="fw-bold">Bs. {{ number_format($lectura->total_pagar, 2) }}</td>
                                             <td>
                                                 <span class="status-pill {{ $lectura->estado === 'pagado' ? 'status-paid' : 'status-pending' }}">
                                                     {{ $lectura->estado === 'pagado' ? 'Pagado' : 'Pendiente' }}
@@ -371,7 +430,10 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="text-center text-secondary py-4">Todavía no hay boletas generadas.</td>
+                                            <td colspan="6" class="text-center text-secondary py-4 small">
+                                                <i class="fa-solid fa-folder-open d-block fs-3 mb-2 text-muted"></i>
+                                                Todavía no hay boletas generadas.
+                                            </td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -385,18 +447,18 @@
 
     <div class="modal fade" id="modalReporteComunidad" tabindex="-1" aria-labelledby="modalReporteComunidadLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title fw-bold" id="modalReporteComunidadLabel">
-                        <i class="fa-solid fa-table me-1"></i> Imprimir Lista por Comunidad
+            <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+                <div class="modal-header border-0 pt-4 px-4">
+                    <h5 class="modal-title fw-bold" id="modalReporteComunidadLabel" style="color: #0f172a;">
+                        <i class="fa-solid fa-table text-primary me-2"></i>Imprimir Lista por Comunidad
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <form action="{{ route('reportes.comunidad') }}" method="GET" target="_blank">
-                    <div class="modal-body">
+                    <div class="modal-body px-4">
                         <div class="mb-3">
                             <label class="form-label fw-semibold text-secondary small">Comunidad</label>
-                            <select name="comunidad_id" class="form-select" required>
+                            <select name="comunidad_id" class="form-select" style="border-color: var(--border-color);" required>
                                 @foreach($comunidades as $comunidad)
                                     <option value="{{ $comunidad->id }}">{{ $comunidad->nombre }}</option>
                                 @endforeach
@@ -405,7 +467,7 @@
                         <div class="row">
                             <div class="col-md-7 mb-3">
                                 <label class="form-label fw-semibold text-secondary small">Mes</label>
-                                <select name="mes" class="form-select" required>
+                                <select name="mes" class="form-select" style="border-color: var(--border-color);" required>
                                     @foreach($meses as $numeroMes => $nombreMes)
                                         <option value="{{ $numeroMes }}" {{ $mesSeleccionado === $numeroMes ? 'selected' : '' }}>{{ $nombreMes }}</option>
                                     @endforeach
@@ -413,13 +475,13 @@
                             </div>
                             <div class="col-md-5 mb-3">
                                 <label class="form-label fw-semibold text-secondary small">Año</label>
-                                <input type="number" name="anio" class="form-control" min="2000" max="2100" value="{{ $anioSeleccionado }}" required>
+                                <input type="number" name="anio" class="form-control" min="2000" max="2100" value="{{ $anioSeleccionado }}" style="border-color: var(--border-color);" required>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer border-0 bg-light">
-                        <button type="button" class="btn btn-secondary fw-semibold" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary fw-semibold">
+                    <div class="modal-footer border-0 bg-light p-3" style="border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
+                        <button type="button" class="btn btn-secondary fw-semibold border-0" data-bs-dismiss="modal" style="background: #e2e8f0; color: #475569;">Cancelar</button>
+                        <button type="submit" class="btn btn-primary fw-semibold px-4">
                             <i class="fa-solid fa-print me-1"></i> Abrir Lista
                         </button>
                     </div>
