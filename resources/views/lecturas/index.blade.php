@@ -824,6 +824,10 @@
                                 </button>
                             </form>
 
+                            <button type="button" class="btn btn-outline-secondary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#modalEditarUsuario" data-usuario-id="{{ $usuario->id }}" data-usuario-nombre="{{ $usuario->nombre }}" style="border-radius: 8px; padding: 0.5rem 0.9rem;">
+                                <i class="fa-solid fa-pen-to-square me-1"></i> Editar
+                            </button>
+
                             <button type="button" class="btn-multa" data-bs-toggle="modal" data-bs-target="#modalMulta" data-usuario-id="{{ $usuario->id }}" data-usuario-nombre="{{ $usuario->nombre }}">
                                 <i class="fa-solid fa-scale-balanced me-1"></i> Multa
                             </button>
@@ -907,6 +911,31 @@
                     <div class="modal-footer border-0 bg-light px-4 py-3" style="border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
                         <button type="button" class="btn btn-secondary fw-semibold" data-bs-dismiss="modal" style="border-radius: 8px;">Cancelar</button>
                         <button type="submit" class="btn btn-primary fw-semibold" style="border-radius: 8px; background-color: var(--sidebar-active); border: none;">Guardar Socio</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalEditarUsuario" tabindex="-1" aria-labelledby="modalEditarUsuarioLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header border-0 pt-4 px-4">
+                    <h5 class="modal-title fw-bold text-dark" id="modalEditarUsuarioLabel">✏️ Editar Nombre del Socio</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formEditarUsuario" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-body px-4 pb-4">
+                        <div class="mb-3">
+                            <label class="form-label text-secondary fw-semibold small">Nombre Completo del Socio</label>
+                            <input type="text" name="nombre" id="editarUsuarioNombre" class="form-control" placeholder="Ej. Cristian Olivera" required style="border-radius: 8px; background:white; color:black;">
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 bg-light px-4 py-3" style="border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
+                        <button type="button" class="btn btn-secondary fw-semibold" data-bs-dismiss="modal" style="border-radius: 8px;">Cancelar</button>
+                        <button type="submit" class="btn btn-primary fw-semibold" style="border-radius: 8px; background-color: var(--sidebar-active); border: none;">Guardar Cambios</button>
                     </div>
                 </form>
             </div>
@@ -1036,6 +1065,22 @@
                     document.getElementById('multa_socio_nombre').textContent = usuarioNombre;
                     // Limpiar selecciones previas
                     modalMulta.querySelectorAll('.multa-check').forEach(cb => cb.checked = false);
+                });
+            }
+
+            const modalEditarUsuario = document.getElementById('modalEditarUsuario');
+            if (modalEditarUsuario) {
+                modalEditarUsuario.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const usuarioId = button.getAttribute('data-usuario-id');
+                    const usuarioNombre = button.getAttribute('data-usuario-nombre');
+                    const formEditar = document.getElementById('formEditarUsuario');
+                    const nombreInput = document.getElementById('editarUsuarioNombre');
+
+                    if (formEditar && nombreInput && usuarioId) {
+                        nombreInput.value = usuarioNombre || '';
+                        formEditar.action = `/usuarios/${usuarioId}`;
+                    }
                 });
             }
 

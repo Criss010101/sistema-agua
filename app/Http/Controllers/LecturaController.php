@@ -264,6 +264,19 @@ class LecturaController extends Controller
         return back()->with('success', 'Socio registrado. La boleta se generará cuando ingrese la lectura y presione "Generar Boleta".');
     }
 
+    public function updateUsuario(Request $request, Usuario $usuario)
+    {
+        $data = $request->validate([
+            'nombre' => 'required|string|max:255',
+        ]);
+
+        $usuario->update([
+            'nombre' => $data['nombre'],
+        ]);
+
+        return back()->with('success', 'Nombre del socio actualizado correctamente.');
+    }
+
     protected function calcularTotalPagar(int $consumo_mes): float
     {
         $base = 23.00;
